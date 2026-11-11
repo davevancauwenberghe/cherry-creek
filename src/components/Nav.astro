@@ -119,6 +119,13 @@ import Icon from './Icon.astro';
     color: var(--color-blossom);
   }
 
+  /* Short screens (landscape phones): scroll the menu instead of clipping it. */
+  .mobile-menu {
+    max-height: calc(100dvh - 6rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
   .mobile-menu:not([hidden]) {
     animation: menu-in 0.28s var(--ease-out-soft);
   }

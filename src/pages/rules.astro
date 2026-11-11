@@ -1,28 +1,48 @@
 ---
-import { rules } from '@/config/rules';
+import { reminders, rules, rulesPublished } from '@/config/rules';
 import { site } from '@/config/site';
 import Page from '@/layouts/Page.astro';
-
-const published = rules.length > 0;
 ---
 
 <Page
   title="Rules"
   description="Community rules for the Cherry Creek Minecraft server."
-  intro={published ? 'A few things we ask of everyone who plays here.' : undefined}
-  noindex={!published}
+  intro={
+    rulesPublished
+      ? 'Cherry Creek keeps its rules short. They apply in Minecraft and on Discord.'
+      : undefined
+  }
+  noindex={!rulesPublished}
 >
-  {published ? (
-    <ol>
-      {rules.map((rule) => (
-        <li>
-          <strong>{rule.title}.</strong> {rule.body}
-        </li>
-      ))}
-    </ol>
+  {rulesPublished ? (
+    <>
+      <h2 id="rules">The rules</h2>
+      <ol>
+        {rules.map((rule) => (
+          <li>{rule}</li>
+        ))}
+      </ol>
+
+      {reminders.length > 0 && (
+        <>
+          <h2 id="reminders">A few things to remember</h2>
+          <ul>
+            {reminders.map((reminder) => (
+              <li>{reminder}</li>
+            ))}
+          </ul>
+        </>
+      )}
+
+      <p>
+        Above all, enjoy the experience. Cherry Creek is about creating a welcoming place where
+        everyone can build something of their own.
+      </p>
+      <p>Happy exploring, and welcome to Cherry Creek! 🌸</p>
+    </>
   ) : (
     <p>
-      The rules haven't been published here yet. For now, you'll find them in the
+      The rules haven't been published here yet. For now, you'll find them in the{' '}
       <a href={site.discordUrl} target="_blank" rel="noopener">
         Cherry Creek Discord
       </a>
