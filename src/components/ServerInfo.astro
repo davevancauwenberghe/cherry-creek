@@ -1,0 +1,112 @@
+---
+/**
+ * Economy and land protection. Figures mirror the live server configuration;
+ * update them here if the config changes.
+ */
+const economy = [
+  { value: '€100', label: 'Starting balance for every new player' },
+  { value: '€20', label: 'Price of one extra claim block' },
+];
+
+const land = [
+  { value: '200', label: 'Claim blocks to start with' },
+  { value: '+50', label: 'Blocks earned per eligible hour of play' },
+  { value: '20,000', label: 'Most blocks you can earn through play' },
+  { value: '8', label: 'Claims per player, at most' },
+];
+---
+
+<section
+  id="server"
+  class="section border-y border-(--line) bg-slate/60"
+  aria-labelledby="server-heading"
+>
+  <div class="shell">
+    <h2 id="server-heading" class="section-title">
+      How the server works
+    </h2>
+    <p class="lede mt-4">
+      Two systems shape daily life on Cherry Creek: a simple economy, and land you can call your
+      own.
+    </p>
+
+    <div class="mt-14 grid gap-14 lg:grid-cols-2 lg:gap-20">
+      <article aria-labelledby="economy-heading" data-reveal>
+        <h3 id="economy-heading" class="text-[1.7rem] font-bold">
+          The Cherry Creek economy
+        </h3>
+        <p class="mt-3 text-silver">
+          Everyone starts with a little money. Buy and sell items in the server shops, run by
+          EconomyShopGUI, with balances handled by EssentialsX and VaultUnlocked.
+        </p>
+        <dl class="facts mt-7" style="--tone: var(--color-gold)">
+          {economy.map((fact) => (
+            <div>
+              <dt>{fact.label}</dt>
+              <dd>{fact.value}</dd>
+            </div>
+          ))}
+        </dl>
+        <p class="mt-6 rounded-2xl border border-gold/25 bg-gold/6 px-4 py-3 text-[0.95rem] text-sand">
+          Euros on Cherry Creek are a fictional in-game currency. They are not real money, payments
+          or cryptocurrency.
+        </p>
+      </article>
+
+      <article aria-labelledby="land-heading" data-reveal style="--i:1">
+        <h3 id="land-heading" class="text-[1.7rem] font-bold">
+          Land protection
+        </h3>
+        <p class="mt-3 text-silver">
+          Claim the land you build on and nobody else can break or take what's inside. Mark out a
+          claim with a<strong class="font-semibold text-snow">golden shovel</strong>, and hold a
+          <strong class="font-semibold text-snow">stick</strong> to see who owns the land you're
+          standing on.
+        </p>
+        <dl class="facts mt-7" style="--tone: var(--color-meadow)">
+          {land.map((fact) => (
+            <div>
+              <dt>{fact.label}</dt>
+              <dd>{fact.value}</dd>
+            </div>
+          ))}
+        </dl>
+        <p class="mt-6 text-[0.95rem] text-silver">
+          Need more room? Extra claim blocks can be bought with in-game euros. Claims don't
+          currently expire when you're away. The{' '}
+          <a class="link" href="/guide#claiming">
+            guide
+          </a>{' '}
+          covers the basics.
+        </p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<style>
+  .facts > div {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding-block: 0.85rem;
+    border-top: 1px solid var(--line);
+  }
+  .facts > div:last-child {
+    border-bottom: 1px solid var(--line);
+  }
+  .facts dt {
+    color: var(--color-snow);
+  }
+  .facts dd {
+    flex-shrink: 0;
+    font-family: var(--font-display);
+    font-variation-settings: 'opsz' 96;
+    font-weight: 700;
+    font-size: 1.6rem;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--tone);
+  }
+</style>

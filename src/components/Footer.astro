@@ -1,0 +1,74 @@
+---
+import { rules } from '@/config/rules';
+import { site } from '@/config/site';
+import Brand from './Brand.astro';
+import CopyAddress from './CopyAddress.astro';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="border-t border-(--line) bg-ink">
+  <div class="shell grid gap-10 py-14 md:grid-cols-[minmax(0,5fr)_minmax(0,3fr)_minmax(0,3fr)]">
+    <div>
+      <Brand />
+      <p class="mt-3 text-silver">{site.tagline}</p>
+      <CopyAddress class="mt-5 max-w-xs" />
+    </div>
+
+    <nav aria-label="Explore">
+      <h2 class="font-sans text-sm font-medium tracking-normal text-silver">Explore</h2>
+      <ul class="mt-3 space-y-2.5">
+        <li>
+          <a class="link" href={site.mapUrl} target="_blank" rel="noopener">
+            Interactive map<span class="sr-only"> (opens in a new tab)</span>
+          </a>
+        </li>
+        <li>
+          <a class="link" href={site.discordUrl} target="_blank" rel="noopener">
+            Discord<span class="sr-only"> (opens in a new tab)</span>
+          </a>
+        </li>
+        <li>
+          <a class="link" href="/#join">
+            How to join
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <nav aria-label="Help">
+      <h2 class="font-sans text-sm font-medium tracking-normal text-silver">Help</h2>
+      <ul class="mt-3 space-y-2.5">
+        <li>
+          <a class="link" href="/guide">
+            Player guide
+          </a>
+        </li>
+        {rules.length > 0 && (
+          <li>
+            <a class="link" href="/rules">
+              Rules
+            </a>
+          </li>
+        )}
+        <li>
+          <a class="link" href="/privacy">
+            Privacy
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+
+  <div class="border-t border-(--line)">
+    <div class="shell flex flex-col gap-2 py-6 text-sm text-silver md:flex-row md:justify-between md:gap-8">
+      <p>
+        © {year} {site.name}
+      </p>
+      <p class="max-w-2xl md:text-right">
+        Cherry Creek is an independent community project. It is not affiliated with or endorsed by
+        Mojang or Microsoft.
+      </p>
+    </div>
+  </div>
+</footer>

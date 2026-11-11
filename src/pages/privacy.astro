@@ -1,0 +1,66 @@
+---
+import { site } from '@/config/site';
+import Page from '@/layouts/Page.astro';
+---
+
+<Page
+  title="Privacy"
+  description="What the Cherry Creek website does, and does not do, with your data."
+  intro="A plain description of how this website works. It is a small community site, and it is built to collect as little as possible."
+>
+  <h2>What this website does not do</h2>
+  <ul>
+    <li>It has no accounts, forms or comment sections, so there is nothing for you to submit.</li>
+    <li>It does not set cookies or use your browser's local storage.</li>
+    <li>It does not use analytics, advertising or tracking scripts.</li>
+    <li>
+      It does not load fonts, scripts or images from other companies. Everything is served from this
+      site.
+    </li>
+  </ul>
+
+  <h2>What happens when you visit</h2>
+  <p>
+    Like any website, loading a page means your browser sends a request that includes your IP
+    address and basic browser details. Requests to this site pass through Cloudflare, which provides
+    its network security and delivery, and then reach the server that hosts the site. Either may
+    keep technical logs of requests for security and troubleshooting.
+  </p>
+
+  <h2>Live server status</h2>
+  <p>
+    The status card asks this website's own server whether the Minecraft server is online. It shows
+    only the online state, the number of players, the player limit and the game version. It never
+    shows player names or IP addresses, and your browser never contacts the Minecraft server
+    directly.
+  </p>
+
+  <h2>Copying the server address</h2>
+  <p>
+    The copy buttons write the server address to your clipboard when you press them. The website
+    cannot read what is on your clipboard.
+  </p>
+
+  <h2>Links to other services</h2>
+  <p>
+    The{' '}
+    <a href={site.mapUrl} target="_blank" rel="noopener">
+      interactive map
+    </a>{' '}
+    and
+    <a href={site.discordUrl} target="_blank" rel="noopener">
+      Discord
+    </a>{' '}
+    are separate services that open in a new tab. Nothing from them is embedded here. Discord has
+    its own privacy policy, and playing on the Minecraft server itself is not covered by this page.
+  </p>
+
+  <h2>Questions</h2>
+  <p>
+    Ask the community administrators on{' '}
+    <a href={site.discordUrl} target="_blank" rel="noopener">
+      Discord
+    </a>
+    .
+  </p>
+</Page>

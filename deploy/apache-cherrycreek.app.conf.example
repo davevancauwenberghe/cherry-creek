@@ -1,0 +1,58 @@
+# Example Apache 2.4 virtual host for https://cherrycreek.app
+#
+# Proxies to the website container on 127.0.0.1:18082. Adjust the port,
+# certificate paths and log paths to match the server, then:
+#
+#   sudo a2enmod proxy proxy_http headers ssl http2 rewrite
+#   sudo cp deploy/apache-cherrycreek.app.conf.example /etc/apache2/sites-available/cherrycreek.app.conf
+#   sudo apache2ctl configtest      # read-only check
+#   sudo a2ensite cherrycreek.app
+#   sudo systemctl reload apache2   # reload, not restart: other sites stay up
+#
+# This file does not touch the BlueMap vhost (map.cherrycreek.app) or the
+# Minecraft server.
+
+<VirtualHost *:80>
+    ServerName cherrycreek.app
+    ServerAlias www.cherrycreek.app
+    RewriteEngine On
+    RewriteRule ^ https://cherrycreek.app%{REQUEST_URI} [R=301,L]
+</VirtualHost>
+
+<VirtualHost *:443>
+    ServerName cherrycreek.app
+    ServerAlias www.cherrycreek.app
+    Protocols h2 http/1.1
+
+    SSLEngine on
+    # Cloudflare Origin CA certificate (Cloudflare SSL mode: Full (strict)).
+    SSLCertificateFile    /etc/ssl/cloudflare/cherrycreek.app.pem
+    SSLCertificateKeyFile /etc/ssl/cloudflare/cherrycreek.app.key
+
+    # One canonical host.
+    RewriteEngine On
+    RewriteCond %{HTTP_HOST} ^www\. [NC]
+    RewriteRule ^ https://cherrycreek.app%{REQUEST_URI} [R=301,L]
+
+    ProxyPreserveHost On
+    ProxyRequests Off
+    RequestHeader set X-Forwarded-Proto "https"
+    ProxyPass        / http://127.0.0.1:18082/ connectiontimeout=3 timeout=15
+    ProxyPassReverse / http://127.0.0.1:18082/
+
+    # Fingerprinted build assets never change.
+    <LocationMatch "^/_astro/">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </LocationMatch>
+
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "DENY"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Permissions-Policy "geolocation=(), camera=(), microphone=(), interest-cohort=()"
+    Header always set Strict-Transport-Security "max-age=31536000"
+    # The site loads everything from itself. Inline style attributes need 'unsafe-inline'.
+    Header always set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'"
+
+    ErrorLog  ${APACHE_LOG_DIR}/cherrycreek.app-error.log
+    CustomLog ${APACHE_LOG_DIR}/cherrycreek.app-access.log combined
+</VirtualHost>

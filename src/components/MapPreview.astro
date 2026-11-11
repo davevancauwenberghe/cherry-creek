@@ -1,0 +1,68 @@
+---
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import previewUrl from '@/assets/art/map-preview.svg?url';
+import { site } from '@/config/site';
+import Icon from './Icon.astro';
+
+// Drop a real capture at src/assets/screenshots/map.* to replace the illustration.
+const found = import.meta.glob<ImageMetadata>(
+  '../assets/screenshots/map.{avif,webp,jpg,jpeg,png}',
+  {
+    eager: true,
+    import: 'default',
+  },
+);
+const screenshot = Object.values(found)[0];
+---
+
+<section id="map" class="section" aria-labelledby="map-heading">
+  <div class="shell">
+    <div class="relative isolate overflow-hidden rounded-4xl border border-(--line)" data-reveal>
+      {screenshot ? (
+        <Image
+          src={screenshot}
+          alt={site.mapScreenshotAlt}
+          widths={[640, 1024, 1600]}
+          sizes="(min-width: 80rem) 72rem, 100vw"
+          loading="lazy"
+          class="absolute inset-0 -z-10 size-full object-cover"
+        />
+      ) : (
+        <img
+          src={previewUrl}
+          alt=""
+          width="960"
+          height="600"
+          loading="lazy"
+          decoding="async"
+          class="absolute inset-0 -z-10 size-full object-cover"
+        />
+      )}
+      <div class="absolute inset-0 -z-10 bg-ink/25"></div>
+
+      <div class="flex min-h-[30rem] items-end p-4 sm:min-h-[34rem] sm:p-8 lg:items-center lg:p-12">
+        <div class="glass max-w-md rounded-3xl p-6 sm:p-8">
+          <h2 id="map-heading" class="text-[clamp(1.9rem,3.4vw,2.6rem)] font-bold">
+            Explore the world
+          </h2>
+          <p class="mt-3 text-snow/85">
+            See everything players have explored in interactive 3D with BlueMap. Fly over the
+            terrain, find your friends' builds, and switch on the claims overlay to see which land
+            is taken.
+          </p>
+          <a href={site.mapUrl} class="btn btn-primary mt-6" target="_blank" rel="noopener">
+            <Icon name="map" size={18} />
+            Open interactive map
+            <span class="sr-only">(opens in a new tab)</span>
+          </a>
+          {!screenshot && (
+            <p class="mt-4 text-sm text-silver">
+              The picture behind this card is an illustration, not the live map.
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

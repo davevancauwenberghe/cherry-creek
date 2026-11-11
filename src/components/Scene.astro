@@ -1,0 +1,44 @@
+---
+/**
+ * Hero backdrop.
+ *
+ * Uses a real screenshot when one exists at src/assets/screenshots/hero.*
+ * and otherwise the original illustrated scene, so the site never passes
+ * stock imagery off as Cherry Creek gameplay.
+ */
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import sceneUrl from '@/assets/art/hero-scene.svg?url';
+import { site } from '@/config/site';
+
+const found = import.meta.glob<ImageMetadata>(
+  '../assets/screenshots/hero.{avif,webp,jpg,jpeg,png}',
+  {
+    eager: true,
+    import: 'default',
+  },
+);
+const screenshot = Object.values(found)[0];
+---
+
+{screenshot ? (
+  <Image
+    src={screenshot}
+    alt={site.heroScreenshotAlt}
+    widths={[768, 1280, 1920, 2560]}
+    sizes="100vw"
+    loading="eager"
+    fetchpriority="high"
+    class="absolute inset-0 size-full object-cover"
+  />
+) : (
+  <img
+    src={sceneUrl}
+    alt=""
+    width="1920"
+    height="1080"
+    decoding="async"
+    fetchpriority="high"
+    class="absolute inset-0 size-full object-cover object-[48%_60%] sm:object-[68%_60%]"
+  />
+)}

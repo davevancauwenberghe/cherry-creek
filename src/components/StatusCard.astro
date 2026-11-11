@@ -1,0 +1,89 @@
+---
+/**
+ * Live server status. Rendered in a neutral "checking" state and filled in
+ * by src/scripts/status.ts from /api/status. Never shows invented data.
+ */
+import CopyAddress from './CopyAddress.astro';
+
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+---
+
+<section
+  class:list={['glass rounded-3xl p-5 sm:p-6', className]}
+  aria-labelledby="status-heading"
+  data-status
+  data-state="checking"
+>
+  <div class="flex items-center justify-between gap-4">
+    <h2 id="status-heading" class="font-sans text-sm font-medium tracking-normal text-silver">
+      Server status
+    </h2>
+    <p class="flex items-center gap-2 text-sm font-semibold" role="status">
+      <span class="status-dot size-2.5 rounded-full" aria-hidden="true"></span>
+      <span data-status-label>Checking</span>
+    </p>
+  </div>
+
+  <dl class="mt-5 grid grid-cols-[auto_1fr] gap-x-10 gap-y-4">
+    <div>
+      <dt class="text-sm text-silver">Players</dt>
+      <dd
+        class="pixel mt-1 text-[1.7rem] leading-none whitespace-nowrap text-snow"
+        data-status-players
+      >
+        <span class="status-skeleton">0 / 10</span>
+      </dd>
+    </div>
+    <div>
+      <dt class="text-sm text-silver">Version</dt>
+      <dd
+        class="pixel mt-1 text-[1.7rem] leading-none whitespace-nowrap text-snow"
+        data-status-version
+      >
+        <span class="status-skeleton">Paper</span>
+      </dd>
+    </div>
+  </dl>
+
+  <CopyAddress class="mt-5" />
+
+  <p class="mt-3 min-h-5 text-sm text-silver" data-status-note>
+    <noscript>Live status needs JavaScript. The address above always works.</noscript>
+  </p>
+</section>
+
+<style>
+  .status-dot {
+    background: var(--color-silver);
+  }
+  [data-state='online'] .status-dot {
+    background: var(--color-meadow);
+    box-shadow: 0 0 0 0 rgb(142 213 163 / 0.55);
+    animation: pulse-dot 2.4s ease-out infinite;
+  }
+  [data-state='offline'] .status-dot {
+    background: var(--color-rose);
+  }
+  [data-state='online'] [data-status-label] {
+    color: var(--color-meadow);
+  }
+
+  /* Placeholder shimmer while the first check is in flight. */
+  .status-skeleton {
+    display: inline-block;
+    border-radius: 0.4rem;
+    color: transparent;
+    user-select: none;
+    background: linear-gradient(
+        90deg,
+        rgb(244 245 244 / 0.08) 25%,
+        rgb(244 245 244 / 0.18) 50%,
+        rgb(244 245 244 / 0.08) 75%
+      )
+      0 0 / 200% 100%;
+    animation: shimmer 1.6s linear infinite;
+  }
+</style>
