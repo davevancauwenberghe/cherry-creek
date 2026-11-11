@@ -3,6 +3,7 @@ import node from '@astrojs/node';
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'astro/config';
+import { rulesPublished } from './src/config/rules.ts';
 
 // Canonical origin used for <link rel="canonical">, Open Graph and the sitemap.
 const site = process.env.SITE_URL || 'https://cherrycreek.app';
@@ -16,7 +17,12 @@ export default defineConfig({
   trailingSlash: 'never',
   // Preserve single spaces between inline elements (Astro 7 defaults to 'jsx').
   compressHTML: true,
-  integrations: [sitemap()],
+  integrations: [
+    sitemap({
+      // The rules placeholder is noindex, so keep it out until rules exist.
+      filter: (page) => rulesPublished || !/\/rules\/?$/.test(page),
+    }),
+  ],
   vite: {
     plugins: [tailwindcss()],
     // Bundle server dependencies into dist/ so the runtime image needs no

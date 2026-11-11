@@ -1,5 +1,5 @@
 ---
-import { rules } from '@/config/rules';
+import { rulesPublished } from '@/config/rules';
 import { site } from '@/config/site';
 import Brand from './Brand.astro';
 import CopyAddress from './CopyAddress.astro';
@@ -44,7 +44,7 @@ const year = new Date().getFullYear();
             Player guide
           </a>
         </li>
-        {rules.length > 0 && (
+        {rulesPublished && (
           <li>
             <a class="link" href="/rules">
               Rules

@@ -1,18 +1,23 @@
 ---
-/**
- * Economy and land protection. Figures mirror the live server configuration;
- * update them here if the config changes.
- */
+/** Economy and land protection. Figures come from src/config/server.ts. */
+import { count, euros, server } from '@/config/server';
+
 const economy = [
-  { value: '€100', label: 'Starting balance for every new player' },
-  { value: '€20', label: 'Price of one extra claim block' },
+  { value: euros(server.economy.startingBalance), label: 'Starting balance for every new player' },
+  { value: euros(server.economy.claimBlockPrice), label: 'Price of one extra claim block' },
 ];
 
 const land = [
-  { value: '200', label: 'Claim blocks to start with' },
-  { value: '+50', label: 'Blocks earned per eligible hour of play' },
-  { value: '20,000', label: 'Most blocks you can earn through play' },
-  { value: '8', label: 'Claims per player, at most' },
+  { value: count(server.claims.startingBlocks), label: 'Claim blocks to start with' },
+  {
+    value: `+${count(server.claims.blocksPerHour)}`,
+    label: 'Blocks earned per eligible hour of play',
+  },
+  {
+    value: count(server.claims.maxAccruedBlocks),
+    label: 'Most blocks you can accrue through play',
+  },
+  { value: count(server.claims.maxClaims), label: 'Claims per player, at most' },
 ];
 ---
 
@@ -36,8 +41,10 @@ const land = [
           The Cherry Creek economy
         </h3>
         <p class="mt-3 text-silver">
-          Everyone starts with a little money. Buy and sell items in the server shops, run by
-          EconomyShopGUI, with balances handled by EssentialsX and VaultUnlocked.
+          Everyone starts with a little money. Buy and sell items in the server shop with{' '}
+          <code class="cmd">/shop</code>, and send money to other players with{' '}
+          <code class="cmd">/pay</code>. Shops are run by EconomyShopGUI, with balances handled by
+          EssentialsX and VaultUnlocked.
         </p>
         <dl class="facts mt-7" style="--tone: var(--color-gold)">
           {economy.map((fact) => (
@@ -72,12 +79,12 @@ const land = [
           ))}
         </dl>
         <p class="mt-6 text-[0.95rem] text-silver">
-          Need more room? Extra claim blocks can be bought with in-game euros. Claims don't
-          currently expire when you're away. The{' '}
+          Need more room? Extra claim blocks can be bought with in-game euros. Claiming works in the
+          Overworld, and claims don't currently expire when you're away. The{' '}
           <a class="link" href="/guide#claiming">
             guide
-          </a>{' '}
-          covers the basics.
+          </a>
+          covers sharing a claim with friends.
         </p>
       </article>
     </div>
@@ -85,6 +92,13 @@ const land = [
 </section>
 
 <style>
+  .cmd {
+    font-family: var(--font-pixel);
+    color: var(--color-sand);
+    padding: 0.05em 0.4em;
+    border-radius: 0.4rem;
+    background: rgb(244 245 244 / 0.08);
+  }
   .facts > div {
     display: flex;
     align-items: baseline;

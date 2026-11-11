@@ -47,7 +47,8 @@ npm run dev             # http://localhost:4321
 ```
 src/
   config/site.ts        Names, addresses and links (single source of truth)
-  config/rules.ts       Community rules (empty until you add them)
+  config/server.ts      Gameplay figures shared by the home page and guide
+  config/rules.ts       Community rules and reminders
   components/           One component per page section, plus shared pieces
   layouts/              Base (head, nav, footer) and Page (text pages)
   pages/                index, guide, rules, privacy, 404, api/status, healthz
@@ -64,8 +65,9 @@ tests/                  Node test runner tests
 ## Editing content
 
 - **Links and addresses:** `src/config/site.ts` (or the `PUBLIC_*` variables below).
-- **Section copy:** each section is a component in `src/components/`. Server figures (starting balance, claim blocks and so on) live at the top of `ServerInfo.astro` and in `src/pages/guide.astro`.
-- **Rules:** add entries to `src/config/rules.ts`. The `/rules` page fills in and the footer link appears on the next build. Until then the page points visitors to Discord and is hidden from search engines.
+- **Section copy:** each section is a component in `src/components/`.
+- **Server figures:** starting balance, claim block price, claim limits and the starter kit live in `src/config/server.ts`. The home page and the player guide both read from it.
+- **Rules:** `src/config/rules.ts` holds the rules and the reminders shown beneath them. If the `rules` list is ever emptied, the page falls back to a pointer to Discord and drops out of the footer, the sitemap and search engines.
 - **Screenshots:** the hero and map card use original illustrations so that nothing is passed off as real gameplay. Add `hero.jpg` and/or `map.jpg` to `src/assets/screenshots/` and they replace the illustrations automatically. See the README in that folder.
 - **New pages:** add a file to `src/pages/` using the `Page` layout. It is added to the sitemap automatically.
 
@@ -102,6 +104,8 @@ Build-time values are baked into the static HTML, so changing them needs a rebui
   "ttl": 45
 }
 ```
+
+`players` is `null` when the server answers without usable counts, and the card shows a dash rather than `0 / 0`.
 
 How it works:
 
@@ -187,9 +191,9 @@ HOST=127.0.0.1 PORT=18082 node dist/server/entry.mjs
 
 - [ ] Confirm the Discord invite in `PUBLIC_DISCORD_URL` is permanent (set to never expire).
 - [ ] Add real screenshots (optional; the illustrations are fine until then).
-- [ ] Add the community rules to `src/config/rules.ts` when they are ready.
 - [ ] Read `src/pages/privacy.astro` against how the server is really configured, in particular Apache and Cloudflare logging.
-- [ ] Check the commands table in `src/pages/guide.astro` against the server's plugin configuration.
+- [ ] In Cloudflare, switch off automatic Web Analytics (RUM) injection for `cherrycreek.app`, or update `src/pages/privacy.astro` to describe it. The privacy page says the site has no analytics, and the example Content Security Policy blocks the beacon script.
+- [ ] Copy the security headers from `deploy/apache-cherrycreek.app.conf.example` into the live vhost.
 
 ## Accessibility and performance notes
 

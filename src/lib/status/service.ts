@@ -43,7 +43,7 @@ export function createStatusService(config: StatusConfig, ping: Ping = pingServe
       lastSuccessAt = checkedAt;
       return {
         state: 'online',
-        players: { online: result.playersOnline, max: result.playersMax },
+        players: result.players,
         version: result.versionName || null,
         checkedAt,
         lastSuccessAt,

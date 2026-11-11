@@ -3,12 +3,18 @@ import { site } from '@/config/site';
 import Icon from './Icon.astro';
 
 const discord = [
-  { title: 'Shared chat', body: 'Messages flow both ways between Minecraft and Discord.' },
+  {
+    title: 'Shared chat',
+    body: 'Messages flow both ways between Minecraft and the #minecraft channel.',
+  },
   { title: 'Comings and goings', body: 'See when players join and leave the server.' },
-  { title: 'Deaths and advancements', body: 'Triumphs and mishaps are announced as they happen.' },
+  {
+    title: 'Deaths, advancements and shop sales',
+    body: 'Triumphs, mishaps and server shop transactions are announced as they happen.',
+  },
   {
     title: 'Optional account linking',
-    body: 'Link your Minecraft account to Discord and receive the Minecrafter role.',
+    body: 'Link your Minecraft account with /discord link to receive the Minecrafter role. It does not replace the whitelist.',
   },
 ];
 ---

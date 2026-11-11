@@ -21,8 +21,8 @@ export interface PingOptions {
 
 export interface PingResult {
   versionName: string;
-  playersOnline: number;
-  playersMax: number;
+  /** Null when the server answered without usable player counts. */
+  players: { online: number; max: number } | null;
 }
 
 export type PingFailure = 'refused' | 'timeout' | 'dns' | 'protocol' | 'network';
@@ -80,10 +80,10 @@ function handshake(host: string, port: number): Buffer {
   return packet(0x00, encodeVarInt(-1), mcString(host), portBytes, encodeVarInt(1));
 }
 
-function toCount(value: unknown): number {
+function toCount(value: unknown): number | null {
   return typeof value === 'number' && Number.isFinite(value) && value >= 0
     ? Math.min(Math.floor(value), 1_000_000)
-    : 0;
+    : null;
 }
 
 /** Keeps only the fields we publish, validated and trimmed. */
@@ -102,6 +102,8 @@ export function parseStatusJson(json: string): PingResult {
     players?: { online?: unknown; max?: unknown };
   };
   const rawName = typeof version?.name === 'string' ? version.name : '';
+  const online = toCount(players?.online);
+  const max = toCount(players?.max);
   return {
     // Strip legacy "§x" colour codes and control characters, then cap the length.
     versionName: rawName
@@ -109,8 +111,8 @@ export function parseStatusJson(json: string): PingResult {
       .replace(/[\u0000-\u001f\u007f]/g, '')
       .trim()
       .slice(0, 48),
-    playersOnline: toCount(players?.online),
-    playersMax: toCount(players?.max),
+    // Both counts or neither: "3 / ?" would be more confusing than a dash.
+    players: online !== null && max !== null ? { online, max } : null,
   };
 }
 

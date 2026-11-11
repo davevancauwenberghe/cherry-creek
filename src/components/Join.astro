@@ -1,6 +1,7 @@
 ---
 import { site } from '@/config/site';
 import CopyAddress from './CopyAddress.astro';
+import { euros, server } from '@/config/server';
 import Icon from './Icon.astro';
 
 const steps = [
@@ -14,7 +15,10 @@ const steps = [
     title: 'Add the server',
     body: 'In Multiplayer, choose Add Server and enter the address below.',
   },
-  { title: 'Begin your adventure', body: 'Once you are approved, connect and start exploring.' },
+  {
+    title: 'Begin your adventure',
+    body: `Once you are approved, connect and start exploring with a small starter kit and ${euros(server.economy.startingBalance)}.`,
+  },
 ];
 ---
 
@@ -45,6 +49,17 @@ const steps = [
         <Icon name="external" size={16} />
         <span class="sr-only">(opens in a new tab)</span>
       </a>
+      <p class="mt-5 text-[0.95rem] text-silver">
+        New here? Read the{' '}
+        <a class="link" href="/guide">
+          player guide
+        </a>{' '}
+        and the
+        <a class="link" href="/rules">
+          rules
+        </a>
+        .
+      </p>
     </div>
 
     <ol class="steps">

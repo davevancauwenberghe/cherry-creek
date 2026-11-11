@@ -51,13 +51,13 @@ test('VarInt round-trips, including negatives', () => {
 test('pings a server and returns only public fields', async () => {
   const port = await fakeServer(sample);
   const result = await pingServer({ host: '127.0.0.1', port, timeoutMs: 1000 });
-  assert.deepEqual(result, { versionName: 'Paper 26.3', playersOnline: 3, playersMax: 10 });
+  assert.deepEqual(result, { versionName: 'Paper 26.3', players: { online: 3, max: 10 } });
 });
 
 test('handles a response split across TCP chunks', async () => {
   const port = await fakeServer(sample, true);
   const result = await pingServer({ host: '127.0.0.1', port, timeoutMs: 1000 });
-  assert.equal(result.playersOnline, 3);
+  assert.equal(result.players?.online, 3);
 });
 
 test('times out against a silent server', async () => {
@@ -81,12 +81,17 @@ test('rejects malformed JSON and sanitises odd values', () => {
   assert.throws(() => parseStatusJson('nope'), PingError);
   assert.deepEqual(
     parseStatusJson('{"version":{"name":"§aPaper\\u0007 1"},"players":{"online":-4,"max":"x"}}'),
-    {
-      versionName: 'Paper 1',
-      playersOnline: 0,
-      playersMax: 0,
-    },
+    { versionName: 'Paper 1', players: null },
   );
+});
+
+test('missing or partial player counts are unknown, not zero', () => {
+  assert.equal(parseStatusJson('{"version":{"name":"Paper 26.3"}}').players, null);
+  assert.equal(parseStatusJson('{"version":{"name":"x"},"players":{"online":2}}').players, null);
+  assert.deepEqual(parseStatusJson('{"players":{"online":0,"max":10}}').players, {
+    online: 0,
+    max: 10,
+  });
 });
 
 test('config validates and clamps environment values', () => {
@@ -107,7 +112,7 @@ test('service caches, de-duplicates and maps failures to neutral states', async 
   const config = { ...readStatusConfig({}), cacheMs: 60_000 };
   const online = createStatusService(config, async () => {
     calls++;
-    return { versionName: 'Paper 26.3', playersOnline: 2, playersMax: 10 };
+    return { versionName: 'Paper 26.3', players: { online: 2, max: 10 } };
   });
   const [a, b] = await Promise.all([online.get(), online.get()]);
   await online.get();
@@ -127,6 +132,14 @@ test('service caches, de-duplicates and maps failures to neutral states', async 
   const unavailable = await slow.get();
   assert.equal(unavailable.state, 'unavailable');
   assert.equal(unavailable.players, null);
+
+  const noCounts = createStatusService(config, async () => ({
+    versionName: 'Paper 26.3',
+    players: null,
+  }));
+  const partial = await noCounts.get();
+  assert.equal(partial.state, 'online');
+  assert.equal(partial.players, null);
 
   const off = createStatusService({ ...config, enabled: false }, async () => {
     throw new Error('must not be called');
