@@ -1,0 +1,60 @@
+---
+import { site } from '@/config/site';
+import Icon from './Icon.astro';
+
+const discord = [
+  { title: 'Shared chat', body: 'Messages flow both ways between Minecraft and Discord.' },
+  { title: 'Comings and goings', body: 'See when players join and leave the server.' },
+  { title: 'Deaths and advancements', body: 'Triumphs and mishaps are announced as they happen.' },
+  {
+    title: 'Optional account linking',
+    body: 'Link your Minecraft account to Discord and receive the Minecrafter role.',
+  },
+];
+---
+
+<section
+  id="community"
+  class="section relative isolate overflow-hidden"
+  aria-labelledby="community-heading"
+>
+  <div class="glow absolute inset-0 -z-10" aria-hidden="true"></div>
+  <div class="shell grid gap-12 lg:grid-cols-2 lg:gap-20">
+    <div>
+      <h2 id="community-heading" class="section-title">
+        A place for builders, explorers and easy-going survivalists
+      </h2>
+      <p class="lede mt-5">
+        Cherry Creek is small on purpose. Come as you are, play at your own pace, and get to know
+        the people you share a world with.
+      </p>
+      <a href={site.discordUrl} class="btn btn-quiet mt-8" target="_blank" rel="noopener">
+        Join the Discord
+        <Icon name="external" size={16} />
+        <span class="sr-only">(opens in a new tab)</span>
+      </a>
+    </div>
+
+    <div class="glass rounded-3xl p-6 sm:p-8" data-reveal>
+      <h3 class="font-sans text-sm font-medium tracking-normal text-silver">
+        On Discord, through DiscordSRV
+      </h3>
+      <ul class="mt-2 divide-y divide-(--line)">
+        {discord.map((item) => (
+          <li class="py-4 last:pb-0">
+            <p class="font-semibold text-snow">{item.title}</p>
+            <p class="mt-0.5 text-silver">{item.body}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .glow {
+    background:
+      radial-gradient(36rem 26rem at 85% 55%, rgb(232 141 165 / 0.14), transparent 70%),
+      radial-gradient(30rem 22rem at 62% 20%, rgb(142 213 163 / 0.1), transparent 70%);
+  }
+</style>

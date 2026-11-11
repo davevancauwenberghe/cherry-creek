@@ -1,0 +1,103 @@
+---
+import { site } from '@/config/site';
+import CopyAddress from './CopyAddress.astro';
+import Icon from './Icon.astro';
+
+const steps = [
+  { title: 'Join the Discord', body: 'Come and say hello to the Cherry Creek community.' },
+  {
+    title: 'Ask about the whitelist',
+    body: 'Message the community administrators. Joining Discord does not add you automatically.',
+  },
+  { title: 'Open Minecraft Java Edition', body: 'Cherry Creek runs on Java Edition.' },
+  {
+    title: 'Add the server',
+    body: 'In Multiplayer, choose Add Server and enter the address below.',
+  },
+  { title: 'Begin your adventure', body: 'Once you are approved, connect and start exploring.' },
+];
+---
+
+<section
+  id="join"
+  class="section border-t border-(--line) bg-slate/60"
+  aria-labelledby="join-heading"
+>
+  <div class="shell grid gap-12 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:gap-20">
+    <div>
+      <h2 id="join-heading" class="section-title">
+        Join Cherry Creek
+      </h2>
+      <p class="lede mt-4">
+        Cherry Creek is whitelisted, so there is one small step before you can connect: ask an
+        administrator to let you in.
+      </p>
+
+      <div class="mt-8 max-w-sm">
+        <p class="mb-2 text-sm text-silver" id="join-address-label">
+          Server address
+        </p>
+        <CopyAddress />
+      </div>
+
+      <a href={site.discordUrl} class="btn btn-primary mt-6" target="_blank" rel="noopener">
+        Join the Discord
+        <Icon name="external" size={16} />
+        <span class="sr-only">(opens in a new tab)</span>
+      </a>
+    </div>
+
+    <ol class="steps">
+      {steps.map((step, i) => (
+        <li data-reveal style={`--i:${i}`}>
+          <span class="pixel step-number" aria-hidden="true">
+            {i + 1}
+          </span>
+          <div>
+            <h3 class="font-sans text-[1.1rem] font-semibold tracking-normal">{step.title}</h3>
+            <p class="mt-1 text-silver">{step.body}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .steps li {
+    position: relative;
+    display: grid;
+    grid-template-columns: 2.5rem 1fr;
+    gap: 1.1rem;
+    padding-bottom: 1.9rem;
+  }
+  .steps li:last-child {
+    padding-bottom: 0;
+  }
+  /* The trail between steps. */
+  .steps li:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    left: calc(1.25rem - 1px);
+    top: 2.9rem;
+    bottom: 0.4rem;
+    border-left: 2px dotted rgb(244 245 244 / 0.2);
+  }
+  .step-number {
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.7rem;
+    border: 1px solid var(--line-strong);
+    background: rgb(244 245 244 / 0.05);
+    color: var(--color-sand);
+    font-size: 1.25rem;
+    line-height: 1;
+  }
+  .steps li:last-child .step-number {
+    background: var(--color-meadow);
+    border-color: transparent;
+    color: #0f2a19;
+  }
+</style>

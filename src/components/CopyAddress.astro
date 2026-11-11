@@ -1,0 +1,70 @@
+---
+/**
+ * Copies the server address to the clipboard.
+ * Behaviour lives in src/scripts/copy.ts; without JS the address is still
+ * visible and selectable.
+ */
+import { site } from '@/config/site';
+import Icon from './Icon.astro';
+
+interface Props {
+  /** 'button' = labelled call to action, 'field' = address with a copy control. */
+  variant?: 'button' | 'field';
+  label?: string;
+  class?: string;
+}
+const { variant = 'field', label = 'Copy server IP', class: className } = Astro.props;
+---
+
+{variant === 'button' ? (
+  <button type="button" class:list={['btn btn-primary', className]} data-copy={site.serverAddress}>
+    <span class="grid" aria-hidden="true">
+      <Icon
+        name="copy"
+        size={18}
+        class="col-start-1 row-start-1 transition-opacity in-data-copied:opacity-0"
+      />
+      <Icon
+        name="check"
+        size={18}
+        class="col-start-1 row-start-1 opacity-0 transition-opacity in-data-copied:opacity-100"
+      />
+    </span>
+    <span data-copy-label data-label-default={label}>
+      {label}
+    </span>
+  </button>
+) : (
+  <div
+    class:list={[
+      'flex items-center gap-2 rounded-xl border border-(--line) bg-ink/50 py-1.5 pr-1.5 pl-4',
+      className,
+    ]}
+  >
+    <span class="pixel min-w-0 flex-1 truncate text-[1.05rem] text-snow select-all">
+      {site.serverAddress}
+    </span>
+    <button
+      type="button"
+      class="inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-lg bg-snow/8 px-3 text-sm font-medium text-snow transition-colors hover:bg-snow/14"
+      data-copy={site.serverAddress}
+      aria-label="Copy server address"
+    >
+      <span class="grid" aria-hidden="true">
+        <Icon
+          name="copy"
+          size={16}
+          class="col-start-1 row-start-1 transition-opacity in-data-copied:opacity-0"
+        />
+        <Icon
+          name="check"
+          size={16}
+          class="col-start-1 row-start-1 text-meadow opacity-0 transition-opacity in-data-copied:opacity-100"
+        />
+      </span>
+      <span data-copy-label data-label-default="Copy">
+        Copy
+      </span>
+    </button>
+  </div>
+)}

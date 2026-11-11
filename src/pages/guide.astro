@@ -1,0 +1,161 @@
+---
+import CopyAddress from '@/components/CopyAddress.astro';
+import { site } from '@/config/site';
+import Page from '@/layouts/Page.astro';
+---
+
+<Page
+  title="Player guide"
+  description="How to join Cherry Creek, claim land, use the in-game economy and find your way around."
+  intro="Everything you need for your first day on Cherry Creek."
+>
+  <h2 id="joining">Joining</h2>
+  <p>
+    Cherry Creek is a whitelisted server, so an administrator needs to approve you before you can
+    connect.
+  </p>
+  <ol>
+    <li>
+      Join the{' '}
+      <a href={site.discordUrl} target="_blank" rel="noopener">
+        Cherry Creek Discord
+      </a>
+      .
+    </li>
+    <li>
+      Contact the community administrators about whitelist access. Joining Discord does not add you
+      automatically.
+    </li>
+    <li>Open Minecraft Java Edition.</li>
+    <li>In Multiplayer, choose Add Server and enter the address below.</li>
+    <li>Once you are approved, connect and begin your adventure.</li>
+  </ol>
+  <div class="not-prose max-w-sm">
+    <CopyAddress />
+  </div>
+
+  <h2 id="claiming">Claiming land</h2>
+  <p>
+    Land protection is handled by GriefPrevention. Inside your claim, other players can't break
+    blocks, place blocks or open your containers unless you let them.
+  </p>
+  <ul>
+    <li>
+      <strong>Create a claim</strong> by holding a golden shovel and right-clicking two opposite
+      corners of the area you want.
+    </li>
+    <li>
+      <strong>Inspect land</strong> by holding a stick and right-clicking the ground to see whether
+      it's claimed.
+    </li>
+    <li>
+      You start with <strong>200 claim blocks</strong>.
+    </li>
+    <li>
+      You earn <strong>50 more for each eligible hour</strong> you play, up to{' '}
+      <strong>20,000</strong> earned blocks.
+    </li>
+    <li>
+      Extra claim blocks cost <strong>€20 each</strong> in in-game currency.
+    </li>
+    <li>
+      You can have up to <strong>8 claims</strong>.
+    </li>
+    <li>Claims are not currently set to expire when you're inactive.</li>
+  </ul>
+
+  <h2 id="economy">The economy</h2>
+  <p>
+    Every player starts with <strong>€100</strong>. You can buy and sell items in the server shops,
+    and spend what you earn on things like extra claim blocks.
+  </p>
+  <p>
+    Euros on Cherry Creek are a fictional in-game currency. They are not real money, payments or
+    cryptocurrency.
+  </p>
+
+  <h2 id="commands">Useful commands</h2>
+  <p>
+    These are the standard commands of the plugins Cherry Creek runs. If one doesn't work for you,
+    ask on Discord: the server's setup may differ.
+  </p>
+  <table>
+    <thead>
+      <tr>
+        <th scope="col">Command</th>
+        <th scope="col">What it does</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <code>/sethome</code>
+        </td>
+        <td>Save where you're standing as a home.</td>
+      </tr>
+      <tr>
+        <td>
+          <code>/home</code>
+        </td>
+        <td>Teleport back to your home.</td>
+      </tr>
+      <tr>
+        <td>
+          <code>/tpa &lt;player&gt;</code>
+        </td>
+        <td>Ask to teleport to another player.</td>
+      </tr>
+      <tr>
+        <td>
+          <code>/tpaccept</code>
+        </td>
+        <td>Accept a teleport request.</td>
+      </tr>
+      <tr>
+        <td>
+          <code>/balance</code>
+        </td>
+        <td>See how much money you have.</td>
+      </tr>
+      <tr>
+        <td>
+          <code>/pay &lt;player&gt; &lt;amount&gt;</code>
+        </td>
+        <td>Send money to another player.</td>
+      </tr>
+      <tr>
+        <td>
+          <code>/shop</code>
+        </td>
+        <td>Open the server shop.</td>
+      </tr>
+      <tr>
+        <td>
+          <code>/trust &lt;player&gt;</code>
+        </td>
+        <td>Let a player build in the claim you're standing in.</td>
+      </tr>
+      <tr>
+        <td>
+          <code>/claimslist</code>
+        </td>
+        <td>List your claims and remaining claim blocks.</td>
+      </tr>
+      <tr>
+        <td>
+          <code>/abandonclaim</code>
+        </td>
+        <td>Remove the claim you're standing in.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2 id="map">The map</h2>
+  <p>
+    The{' '}
+    <a href={site.mapUrl} target="_blank" rel="noopener">
+      interactive map
+    </a>{' '}
+    shows the explored world in 3D, with an overlay for claimed land.
+  </p>
+</Page>

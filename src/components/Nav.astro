@@ -1,0 +1,131 @@
+---
+import { nav, site } from '@/config/site';
+import Brand from './Brand.astro';
+import Icon from './Icon.astro';
+---
+
+<header class="fixed inset-x-0 top-0 z-50 px-3 pt-3 sm:px-5 sm:pt-4" data-nav>
+  <div class="glass mx-auto max-w-304 rounded-[1.4rem]">
+    <div class="flex h-15 items-center gap-2 pr-2 pl-4 sm:pl-5">
+      <Brand />
+
+      <nav class="ml-auto hidden lg:block" aria-label="Main">
+        <ul class="flex items-center gap-0.5 text-[0.925rem]">
+          {nav.map((item) => (
+            <li>
+              <a class="nav-link" href={item.href} data-nav-link>
+                {item.label}
+              </a>
+            </li>
+          ))}
+          <li>
+            <a class="nav-link" href={site.mapUrl} target="_blank" rel="noopener">
+              Interactive map
+              <Icon name="external" size={14} class="opacity-60" />
+              <span class="sr-only">(opens in a new tab)</span>
+            </a>
+          </li>
+          <li>
+            <a class="nav-link" href={site.discordUrl} target="_blank" rel="noopener">
+              Join Discord
+              <Icon name="external" size={14} class="opacity-60" />
+              <span class="sr-only">(opens in a new tab)</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+      <a href="/#join" class="btn btn-primary ml-auto min-h-10 px-4 py-2 lg:ml-2">
+        Play now
+      </a>
+
+      <button
+        type="button"
+        class="grid size-10 place-items-center rounded-full text-snow transition-colors hover:bg-snow/10 lg:hidden"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+        data-menu-toggle
+      >
+        <span class="sr-only">Menu</span>
+        <Icon name="menu" size={22} class="in-aria-expanded:hidden" />
+        <Icon name="close" size={22} class="hidden in-aria-expanded:block" />
+      </button>
+    </div>
+
+    <nav id="mobile-menu" class="mobile-menu lg:hidden" aria-label="Main" hidden>
+      <ul class="border-t border-(--line) px-2 py-2">
+        {nav.map((item) => (
+          <li>
+            <a class="mobile-link" href={item.href} data-nav-link>
+              {item.label}
+            </a>
+          </li>
+        ))}
+        <li>
+          <a class="mobile-link" href={site.mapUrl} target="_blank" rel="noopener">
+            Interactive map
+            <Icon name="external" size={16} class="opacity-60" />
+            <span class="sr-only">(opens in a new tab)</span>
+          </a>
+        </li>
+        <li>
+          <a class="mobile-link" href={site.discordUrl} target="_blank" rel="noopener">
+            Join Discord
+            <Icon name="external" size={16} class="opacity-60" />
+            <span class="sr-only">(opens in a new tab)</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .nav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.5rem 0.8rem;
+    border-radius: 999px;
+    color: rgb(244 245 244 / 0.82);
+    font-weight: 500;
+    transition:
+      color 0.2s,
+      background-color 0.2s;
+  }
+  .nav-link:hover {
+    color: var(--color-snow);
+    background: rgb(244 245 244 / 0.08);
+  }
+  .nav-link[aria-current] {
+    color: var(--color-blossom);
+    background: rgb(255 183 197 / 0.12);
+  }
+
+  .mobile-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 3rem;
+    padding: 0.5rem 0.9rem;
+    border-radius: 0.9rem;
+    font-size: 1.05rem;
+    font-weight: 500;
+  }
+  .mobile-link:hover {
+    background: rgb(244 245 244 / 0.08);
+  }
+  .mobile-link[aria-current] {
+    color: var(--color-blossom);
+  }
+
+  .mobile-menu:not([hidden]) {
+    animation: menu-in 0.28s var(--ease-out-soft);
+  }
+  @keyframes menu-in {
+    from {
+      opacity: 0;
+      transform: translateY(-6px);
+    }
+  }
+</style>

@@ -1,0 +1,32 @@
+---
+import { rules } from '@/config/rules';
+import { site } from '@/config/site';
+import Page from '@/layouts/Page.astro';
+
+const published = rules.length > 0;
+---
+
+<Page
+  title="Rules"
+  description="Community rules for the Cherry Creek Minecraft server."
+  intro={published ? 'A few things we ask of everyone who plays here.' : undefined}
+  noindex={!published}
+>
+  {published ? (
+    <ol>
+      {rules.map((rule) => (
+        <li>
+          <strong>{rule.title}.</strong> {rule.body}
+        </li>
+      ))}
+    </ol>
+  ) : (
+    <p>
+      The rules haven't been published here yet. For now, you'll find them in the
+      <a href={site.discordUrl} target="_blank" rel="noopener">
+        Cherry Creek Discord
+      </a>
+      , or ask an administrator.
+    </p>
+  )}
+</Page>

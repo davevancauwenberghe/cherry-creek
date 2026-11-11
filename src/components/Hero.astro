@@ -1,0 +1,76 @@
+---
+import { site } from '@/config/site';
+import CopyAddress from './CopyAddress.astro';
+import Icon from './Icon.astro';
+import Petals from './Petals.astro';
+import Scene from './Scene.astro';
+import StatusCard from './StatusCard.astro';
+---
+
+<section id="top" class="relative isolate flex min-h-svh flex-col justify-end overflow-hidden">
+  <div class="absolute inset-0 -z-10">
+    <Scene />
+    <!-- Shade the left and bottom, where the text sits; leave the sky clear. -->
+    <div class="absolute inset-0 bg-linear-to-r from-ink/75 via-ink/25 via-45% to-transparent to-75%"></div>
+    <div class="absolute inset-0 bg-linear-to-t from-ink via-transparent via-40% to-transparent"></div>
+    <!-- Portrait screens crop the scene tightly, so text needs a little more help. -->
+    <div class="absolute inset-0 bg-ink/30 sm:hidden"></div>
+    <Petals />
+  </div>
+
+  <div class="shell grid items-end gap-10 pt-32 pb-12 sm:pb-16 lg:grid-cols-[minmax(0,1fr)_23rem] lg:gap-16 lg:pb-20">
+    <div>
+      <h1 class="hero-title hero-rise" style="--i:0">
+        <span class="block">Cherry</span>
+        <span class="block">Creek</span>
+      </h1>
+      <p
+        class="hero-rise mt-6 font-display text-[clamp(1.4rem,2.6vw,2rem)] leading-tight font-medium text-snow"
+        style="--i:1"
+      >
+        {site.tagline}
+      </p>
+      <p class="hero-rise mt-4 max-w-136 text-[1.075rem] text-snow/80" style="--i:2">
+        Discover a welcoming survival community where every build tells a story, every adventure
+        matters, and there's always somewhere new to explore.
+      </p>
+
+      <div class="hero-rise mt-8 flex flex-wrap items-center gap-3" style="--i:3">
+        <CopyAddress variant="button" />
+        <a href={site.mapUrl} class="btn btn-glass glass glass-thin" target="_blank" rel="noopener">
+          <Icon name="map" size={18} />
+          Explore the map
+          <span class="sr-only">(opens in a new tab)</span>
+        </a>
+      </div>
+      <p class="hero-rise mt-5 text-[0.95rem] text-snow/75" style="--i:4">
+        Whitelisted server. Say hello on
+        <a href={site.discordUrl} class="link" target="_blank" rel="noopener">
+          Discord<span class="sr-only"> (opens in a new tab)</span>
+        </a>{' '}
+        to ask for access.
+      </p>
+    </div>
+
+    <StatusCard class="hero-rise" />
+  </div>
+</section>
+
+<style>
+  .hero-title {
+    font-size: clamp(4.25rem, 15vw, 11.5rem);
+    font-weight: 800;
+    line-height: 0.8;
+    letter-spacing: -0.045em;
+    text-transform: uppercase;
+    color: var(--color-snow);
+    text-shadow: 0 2px 40px rgb(13 21 24 / 0.55);
+  }
+  .hero-title span:last-child {
+    /* A half-step indent, like a bend in the creek. */
+    padding-left: 0.42em;
+  }
+  :global(.hero-rise[data-status]) {
+    --i: 5;
+  }
+</style>

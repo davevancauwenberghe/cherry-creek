@@ -1,0 +1,36 @@
+# Cherry Creek website.
+#
+# Works with `docker compose up -d --build` and with Coolify's Docker Compose
+# build pack. The container is published on the loopback interface only;
+# Apache on the host proxies to it. Nothing is exposed to the internet.
+services:
+  web:
+    build:
+      context: .
+      args:
+        SITE_URL: ${SITE_URL:-https://cherrycreek.app}
+        PUBLIC_SERVER_ADDRESS: ${PUBLIC_SERVER_ADDRESS:-play.cherrycreek.app}
+        PUBLIC_MAP_URL: ${PUBLIC_MAP_URL:-https://map.cherrycreek.app}
+        PUBLIC_DISCORD_URL: ${PUBLIC_DISCORD_URL:-https://discord.gg/dRxSt8Bt9t}
+    restart: unless-stopped
+    ports:
+      - '127.0.0.1:${HOST_PORT:-18082}:4321'
+    environment:
+      PUBLIC_SERVER_ADDRESS: ${PUBLIC_SERVER_ADDRESS:-play.cherrycreek.app}
+      STATUS_ENABLED: ${STATUS_ENABLED:-true}
+      MC_STATUS_HOST: ${MC_STATUS_HOST:-}
+      MC_STATUS_PORT: ${MC_STATUS_PORT:-25565}
+      STATUS_CACHE_SECONDS: ${STATUS_CACHE_SECONDS:-45}
+      STATUS_TIMEOUT_MS: ${STATUS_TIMEOUT_MS:-3000}
+    # Lets MC_STATUS_HOST=host.docker.internal reach the Docker host.
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 192m
+    cpus: 0.5

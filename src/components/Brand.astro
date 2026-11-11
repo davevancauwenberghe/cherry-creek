@@ -1,0 +1,18 @@
+---
+import markSvg from '@/assets/art/mark.svg?raw';
+import { site } from '@/config/site';
+
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+---
+
+<a href="/#top" class:list={['inline-flex items-center gap-2.5 rounded-lg', className]}>
+  <span
+    class="block w-7 [&>svg]:block [&>svg]:h-auto [&>svg]:w-full"
+    aria-hidden="true"
+    set:html={markSvg}
+  />
+  <span class="font-display text-[1.15rem] leading-none font-bold tracking-tight">{site.name}</span>
+</a>

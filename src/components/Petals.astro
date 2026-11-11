@@ -1,0 +1,33 @@
+---
+/** A handful of drifting pixel petals. Decorative; hidden for reduced motion. */
+const petals = [
+  { left: 8, size: 7, duration: 19, delay: -3, drift: 14, opacity: 0.55 },
+  { left: 21, size: 5, duration: 24, delay: -14, drift: -10, opacity: 0.4 },
+  { left: 37, size: 8, duration: 21, delay: -8, drift: 18, opacity: 0.6 },
+  { left: 52, size: 5, duration: 27, delay: -20, drift: -14, opacity: 0.35 },
+  { left: 64, size: 6, duration: 18, delay: -1, drift: 10, opacity: 0.5 },
+  { left: 77, size: 8, duration: 23, delay: -11, drift: -18, opacity: 0.6 },
+  { left: 88, size: 5, duration: 26, delay: -17, drift: -8, opacity: 0.4 },
+  { left: 95, size: 7, duration: 20, delay: -6, drift: -22, opacity: 0.5 },
+];
+---
+
+<div class="petals pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+  {petals.map((p) => (
+    <span
+      class="petal"
+      style={`left:${p.left}%;width:${p.size}px;height:${p.size}px;animation-duration:${p.duration}s;animation-delay:${p.delay}s;--petal-drift:${p.drift}vw;--petal-opacity:${p.opacity}`}
+    />
+  ))}
+</div>
+
+<style>
+  .petal {
+    position: absolute;
+    top: 0;
+    background: var(--color-blossom);
+    opacity: 0;
+    animation: petal-fall linear infinite;
+    will-change: transform;
+  }
+</style>

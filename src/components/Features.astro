@@ -1,0 +1,128 @@
+---
+import sceneUrl from '@/assets/art/hero-scene.svg?url';
+import Icon from './Icon.astro';
+
+const features = [
+  {
+    icon: 'shield',
+    title: 'Protect your creations',
+    body: 'GriefPrevention lets you claim land and keep your builds safe.',
+    tone: 'meadow',
+  },
+  {
+    icon: 'coins',
+    title: 'A living economy',
+    body: 'Earn and spend in-game euros with EssentialsX and EconomyShopGUI.',
+    tone: 'gold',
+  },
+  {
+    icon: 'home',
+    title: 'Quality of life',
+    body: 'Homes, teleport requests and a few carefully chosen gameplay enhancements.',
+    tone: 'sand',
+  },
+  {
+    icon: 'compass',
+    title: 'Explore every corner',
+    body: 'Landscapes, biomes and player creations to discover across the world.',
+    tone: 'meadow',
+  },
+  {
+    icon: 'chat',
+    title: 'Connected community',
+    body: 'Chat across Minecraft and Discord through DiscordSRV, with activity announcements.',
+    tone: 'blossom',
+  },
+] as const;
+---
+
+<section
+  id="features"
+  class="section relative isolate overflow-hidden"
+  aria-labelledby="features-heading"
+>
+  <!-- Soft colour for the glass to pick up. -->
+  <div class="glow absolute inset-0 -z-10" aria-hidden="true"></div>
+
+  <div class="shell">
+    <h2 id="features-heading" class="section-title">
+      Why Cherry Creek?
+    </h2>
+    <p class="lede mt-4">
+      A small server with the things that make survival better with friends, and none of the noise
+      that comes with a big network.
+    </p>
+
+    <ul class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-6 lg:grid-rows-[repeat(2,minmax(11rem,auto))]">
+      <li
+        class="feature-lead relative isolate overflow-hidden rounded-3xl border border-(--line) sm:col-span-2 lg:col-span-3 lg:row-span-2"
+        data-reveal
+      >
+        <img
+          src={sceneUrl}
+          alt=""
+          width="1920"
+          height="1080"
+          loading="lazy"
+          decoding="async"
+          class="absolute inset-0 -z-10 size-full origin-[12%_78%] scale-[1.7] object-cover object-[12%_78%]"
+        />
+        <div class="absolute inset-0 -z-10 bg-linear-to-t from-ink via-ink/55 to-ink/10"></div>
+        <div class="flex h-full min-h-80 flex-col justify-end p-6 sm:p-8">
+          <Icon name="users" size={28} class="text-blossom" />
+          <h3 class="mt-4 text-[clamp(1.7rem,3vw,2.4rem)] font-bold">Survival, together</h3>
+          <p class="mt-2 max-w-md text-[1.05rem] text-snow/85">
+            A friendly survival world where players build, explore and collaborate.
+          </p>
+        </div>
+      </li>
+
+      {features.map((feature, i) => (
+        <li
+          class:list={[
+            'glass rounded-3xl p-6',
+            i < 2 ? 'lg:col-span-3' : 'lg:col-span-2',
+            i === 4 && 'sm:col-span-2',
+          ]}
+          data-reveal
+          style={`--i:${i + 1}`}
+          data-tone={feature.tone}
+        >
+          <Icon name={feature.icon} size={24} class="feature-icon" />
+          <h3 class="mt-4 text-xl font-semibold">{feature.title}</h3>
+          <p class="mt-1.5 text-silver">{feature.body}</p>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .glow {
+    background:
+      radial-gradient(38rem 26rem at 78% 30%, rgb(142 213 163 / 0.16), transparent 70%),
+      radial-gradient(34rem 24rem at 60% 85%, rgb(232 141 165 / 0.16), transparent 70%),
+      radial-gradient(30rem 22rem at 12% 60%, rgb(245 201 106 / 0.08), transparent 70%);
+  }
+  [data-tone='meadow'] :global(.feature-icon) {
+    color: var(--color-meadow);
+  }
+  [data-tone='gold'] :global(.feature-icon) {
+    color: var(--color-gold);
+  }
+  [data-tone='sand'] :global(.feature-icon) {
+    color: var(--color-sand);
+  }
+  [data-tone='blossom'] :global(.feature-icon) {
+    color: var(--color-blossom);
+  }
+  li.glass {
+    transition:
+      transform 0.35s var(--ease-out-soft),
+      border-color 0.3s;
+  }
+  li.glass:hover {
+    transform: translateY(-3px);
+    border-color: var(--line-strong);
+  }
+</style>
