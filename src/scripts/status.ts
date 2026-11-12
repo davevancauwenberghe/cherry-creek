@@ -6,12 +6,6 @@ interface PublicStatus {
   checkedAt: string;
   lastSuccessAt: string | null;
   ttl: number;
-  activity: {
-    since: string;
-    peak: number;
-    low: number;
-    buckets: (number | null)[];
-  } | null;
 }
 
 const cards = [...document.querySelectorAll<HTMLElement>('[data-status]')];
@@ -47,55 +41,6 @@ const LABELS: Record<PublicStatus['state'] | 'error', string> = {
   error: 'Status unavailable',
 };
 
-const SVG_NS = 'http://www.w3.org/2000/svg';
-const DAY_MS = 24 * 60 * 60 * 1000;
-
-/** Sparkline of anonymous player counts the website has observed. */
-function renderActivity(card: HTMLElement) {
-  const box = card.querySelector<HTMLElement>('[data-status-activity]');
-  if (!box) return;
-  const activity = failed ? null : latest?.activity;
-  box.hidden = !activity;
-  if (!activity) return;
-
-  const plural = (n: number) => `${n} ${n === 1 ? 'player' : 'players'}`;
-  const summary = box.querySelector('[data-activity-summary]');
-  if (summary) {
-    summary.textContent =
-      activity.peak === activity.low
-        ? `Steady at ${plural(activity.peak)}`
-        : `Peak ${activity.peak}, low ${activity.low}`;
-  }
-  const range = box.querySelector('[data-activity-range]');
-  if (range) {
-    // The record restarts with the website, so say how far back it really goes.
-    const full = Date.now() - new Date(activity.since).getTime() > DAY_MS - 45 * 60 * 1000;
-    range.replaceChildren(
-      full ? 'Last 24 hours' : 'Players since ',
-      ...(full ? [] : [timeEl(activity.since)]),
-    );
-  }
-
-  const chart = box.querySelector('[data-activity-chart]');
-  if (!chart) return;
-  const scale = Math.max(activity.peak, 1);
-  const width = 192 / activity.buckets.length;
-  chart.replaceChildren(
-    ...activity.buckets.flatMap((value, i) => {
-      if (value === null) return [];
-      const bar = document.createElementNS(SVG_NS, 'rect');
-      // Empty half hours keep a low stub so quiet time reads differently from no data.
-      const height = value === 0 ? 2 : 4 + (value / scale) * 28;
-      bar.setAttribute('x', String(i * width + 0.5));
-      bar.setAttribute('y', String(32 - height));
-      bar.setAttribute('width', String(width - 1));
-      bar.setAttribute('height', String(height));
-      if (value === 0) bar.setAttribute('data-empty', '');
-      return [bar];
-    }),
-  );
-}
-
 function render() {
   const state = failed || !latest ? 'error' : latest.state;
   for (const card of cards) {
@@ -113,8 +58,6 @@ function render() {
     }
     const version = card.querySelector('[data-status-version]');
     if (version) version.textContent = (!failed && latest?.version) || '–';
-
-    renderActivity(card);
 
     const note = card.querySelector('[data-status-note]');
     if (!note) continue;

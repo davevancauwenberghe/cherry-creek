@@ -107,8 +107,6 @@ Build-time values are baked into the static HTML, so changing them needs a rebui
 
 `players` is `null` when the server answers without usable counts, and the card shows a dash rather than `0 / 0`.
 
-The response also carries `activity`: the highest and lowest player counts the website has seen in the last 24 hours, plus a peak per half hour for the small chart on the status card. It is built only from the site's own checks, contains totals and nothing else, and is `null` until there is something to show. To cover hours when nobody visits, the server checks on its own every five minutes once the first visitor has arrived. The record is held in memory, so it starts again whenever the container restarts; the card then says "Players since …" instead of "Last 24 hours".
-
 How it works:
 
 - The server speaks Minecraft's standard **Server List Ping** over TCP, the same thing the multiplayer screen does. That one request provides availability, version and player counts, so **UDP Query and RCON are not used**.

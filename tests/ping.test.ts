@@ -9,7 +9,7 @@ import {
   pingServer,
 } from '../src/lib/minecraft/ping.ts';
 import { readStatusConfig } from '../src/lib/status/config.ts';
-import { createStatusService, summariseActivity } from '../src/lib/status/service.ts';
+import { createStatusService } from '../src/lib/status/service.ts';
 
 const servers: Server[] = [];
 after(() => servers.forEach((s) => s.close()));
@@ -145,43 +145,4 @@ test('service caches, de-duplicates and maps failures to neutral states', async 
     throw new Error('must not be called');
   });
   assert.equal((await off.get()).state, 'disabled');
-});
-
-test('activity summarises anonymous player counts over the last 24 hours', () => {
-  const now = Date.parse('2026-11-12T12:00:00Z');
-  const minute = 60_000;
-  assert.equal(summariseActivity([], now), null);
-
-  const activity = summariseActivity(
-    [
-      { at: now - 25 * 60 * minute, online: 9 }, // older than the window: ignored
-      { at: now - 23 * 60 * minute, online: 1 },
-      { at: now - 40 * minute, online: 4 },
-      { at: now - 35 * minute, online: 2 },
-      { at: now - 5 * minute, online: 0 },
-    ],
-    now,
-  )!;
-  assert.equal(activity.peak, 4);
-  assert.equal(activity.low, 0);
-  assert.equal(activity.buckets.length, 48);
-  assert.equal(activity.buckets.at(-1), 0);
-  assert.equal(activity.buckets.at(-2), 4); // the highest count in that half hour
-  assert.equal(activity.buckets.at(-3), null);
-  assert.equal(activity.buckets[1], 1);
-  assert.equal(activity.since, new Date(now - 23 * 60 * minute).toISOString());
-});
-
-test('service records activity from its own checks only when counts are known', async () => {
-  const config = { ...readStatusConfig({}), cacheMs: 0 };
-  const answers = [{ online: 2, max: 10 }, null, { online: 5, max: 10 }];
-  const service = createStatusService(config, async () => ({
-    versionName: 'Paper 26.3',
-    players: answers.shift() ?? null,
-  }));
-  await service.get();
-  await service.get();
-  const last = await service.get();
-  assert.equal(last.activity?.peak, 5);
-  assert.equal(last.activity?.low, 2);
 });
