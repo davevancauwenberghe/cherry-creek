@@ -188,7 +188,8 @@
     max-width: 38rem;
   }
 
-  /* ---- Long-form pages ------------------------------------------------ */
+  /* ---- Long-form pages ------------------------------------------------
+     Add .not-prose to a widget inside .prose to opt it out of these rules. */
   .prose {
     max-width: 44rem;
     color: #cfd6d5;
@@ -196,48 +197,48 @@
   .prose > * + * {
     margin-top: 1.1rem;
   }
-  .prose h2 {
+  .prose h2:not(.not-prose, .not-prose *) {
     margin-top: 3rem;
     font-size: 1.7rem;
     font-weight: 700;
     color: var(--color-snow);
   }
-  .prose h3 {
+  .prose h3:not(.not-prose, .not-prose *) {
     margin-top: 2rem;
     font-size: 1.2rem;
     font-weight: 650;
     color: var(--color-snow);
   }
-  .prose ul,
-  .prose ol {
+  .prose ul:not(.not-prose, .not-prose *),
+  .prose ol:not(.not-prose, .not-prose *) {
     padding-left: 1.25rem;
   }
-  .prose ul {
+  .prose ul:not(.not-prose, .not-prose *) {
     list-style: disc;
   }
-  .prose ol {
+  .prose ol:not(.not-prose, .not-prose *) {
     list-style: decimal;
   }
-  .prose li + li {
+  .prose li + li:not(.not-prose, .not-prose *) {
     margin-top: 0.4rem;
   }
-  .prose li::marker {
+  .prose li:not(.not-prose, .not-prose *)::marker {
     color: var(--color-rose);
   }
-  .prose a {
+  .prose a:not(.not-prose, .not-prose *) {
     color: var(--color-snow);
     text-decoration: underline;
     text-decoration-color: rgb(255 183 197 / 0.6);
     text-underline-offset: 0.22em;
   }
-  .prose a:hover {
+  .prose a:not(.not-prose, .not-prose *):hover {
     text-decoration-color: var(--color-blossom);
   }
-  .prose strong {
+  .prose strong:not(.not-prose, .not-prose *) {
     color: var(--color-snow);
     font-weight: 600;
   }
-  .prose code {
+  .prose code:not(.not-prose, .not-prose *) {
     font-family: var(--font-pixel);
     font-size: 0.95em;
     padding: 0.1em 0.45em;
@@ -246,19 +247,19 @@
     color: var(--color-sand);
     white-space: nowrap;
   }
-  .prose table {
+  .prose table:not(.not-prose, .not-prose *) {
     width: 100%;
     border-collapse: collapse;
     font-size: 0.95rem;
   }
-  .prose th,
-  .prose td {
+  .prose th:not(.not-prose, .not-prose *),
+  .prose td:not(.not-prose, .not-prose *) {
     text-align: left;
     padding: 0.65rem 0.75rem 0.65rem 0;
     border-bottom: 1px solid var(--line);
     vertical-align: top;
   }
-  .prose th {
+  .prose th:not(.not-prose, .not-prose *) {
     color: var(--color-silver);
     font-weight: 500;
   }

@@ -1,10 +1,18 @@
 ---
 import CopyAddress from '@/components/CopyAddress.astro';
-import { count, euros, server } from '@/config/server';
+import Checklist from '@/components/guide/Checklist.astro';
+import ClaimPlanner from '@/components/guide/ClaimPlanner.astro';
+import CommandFinder from '@/components/guide/CommandFinder.astro';
+import { autoClaimArea, autoClaimSide, count, euros, server } from '@/config/server';
 import { site } from '@/config/site';
-import Page from '@/layouts/Page.astro';
+import Base from '@/layouts/Base.astro';
 
 const { economy, claims, starterKit } = server;
+
+// Whole sentences are built here rather than mixing text and {expressions}
+// across line breaks in the template, where the space between them gets lost.
+const firstChestNote = `Placing it creates a ${autoClaimSide} × ${autoClaimSide} claim around it automatically, using ${autoClaimArea} of your claim blocks.`;
+const combatNote = `are blocked for ${server.pvp.combatTimeoutSeconds} seconds after fighting another player.`;
 
 const sections = [
   { id: 'joining', label: 'Joining' },
@@ -13,407 +21,417 @@ const sections = [
   { id: 'economy', label: 'The economy' },
   { id: 'homes', label: 'Homes and teleportation' },
   { id: 'mining', label: 'Mining and equipment' },
-  { id: 'exploring', label: 'Exploring the world' },
+  { id: 'map', label: 'The world map' },
   { id: 'doors', label: 'Doors and buildings' },
-  { id: 'villagers', label: 'Villagers' },
-  { id: 'discord', label: 'Discord integration' },
-  { id: 'commands', label: 'Useful commands' },
+  { id: 'commands', label: 'Command finder' },
 ];
 
-const trustCommands = [
-  ['/accesstrust <player>', 'Use basic interactions such as buttons, levers and beds.'],
-  [
-    '/containertrust <player>',
-    'Access containers, crafting equipment and other protected interactions, but not build freely.',
-  ],
-  ['/trust <player>', 'Build and break blocks inside your claim.'],
-  ['/untrust <player>', "Remove a player's permissions."],
-  ['/trustlist', 'See who has access to your claim.'],
-];
-
-const commands = [
-  ['/sethome', 'Save your current location as a home.'],
-  ['/sethome <name>', 'Create a named home.'],
-  ['/home', 'Return to your home or select one.'],
-  ['/home <name>', 'Teleport to a named home.'],
-  ['/delhome <name>', 'Delete a saved home.'],
-  ['/tpa <player>', 'Ask to teleport to another player.'],
-  ['/tpaccept', 'Accept a teleport request.'],
-  ['/tpdeny', 'Decline a teleport request.'],
-  ['/balance', 'Check your balance.'],
-  ['/pay <player> <amount>', 'Send in-game money to another player.'],
-  ['/shop', 'Open the server shop.'],
-  ['/market', 'Alternative command for the shop.'],
-  ['/sellgui', 'Open the selling interface.'],
-  ['/sellall', "Access the shop's bulk-selling command."],
-  ['/buyclaimblocks <amount>', 'Purchase extra claim blocks.'],
-  ['/claimslist', 'View your claims and available claim blocks.'],
-  ['/trust <player>', 'Allow another player to build in your claim.'],
-  ['/containertrust <player>', 'Allow access to protected containers and equipment.'],
-  ['/accesstrust <player>', 'Allow basic interactions in your claim.'],
-  ['/untrust <player>', "Remove a player's claim permissions."],
-  ['/trustlist', 'Display trusted players for your claim.'],
-  ['/abandonclaim', "Delete the claim you're standing in."],
-  ['/ba discovered', 'View discovered biomes.'],
-  ['/ba mode new', 'Show announcements only for newly discovered biomes.'],
-  ['/discord', 'Display the Discord community information.'],
-  ['/discord link', 'Link your Minecraft and Discord accounts.'],
+const trustLevels = [
+  {
+    command: '/accesstrust <player>',
+    grants: 'Use basic interactions such as buttons, levers and beds.',
+  },
+  {
+    command: '/containertrust <player>',
+    grants:
+      'Access containers, crafting equipment and other protected interactions, but not build freely.',
+  },
+  { command: '/trust <player>', grants: 'Build and break blocks inside your claim.' },
+  { command: '/untrust <player>', grants: "Remove a player's permissions." },
+  { command: '/trustlist', grants: 'See who has access to your claim.' },
 ];
 ---
 
-<Page
+<Base
   title="Player guide"
-  description="How to join Cherry Creek, claim land, use the in-game economy, travel, and make the most of the server's plugins."
-  intro="Everything you need for your first days on Cherry Creek."
+  description="How to join Cherry Creek, claim land, use the in-game economy and travel, with a first-day checklist, a claim planner and a searchable command list."
 >
-  <nav class="not-prose toc" aria-labelledby="toc-heading">
-    <h2 id="toc-heading" class="font-sans text-sm font-medium tracking-normal text-silver">
-      On this page
-    </h2>
-    <ul class="mt-3 grid gap-x-8 gap-y-2 sm:grid-cols-2">
-      {sections.map((section) => (
+  <div class="page-top">
+    <div class="shell pt-36 pb-10 sm:pt-44">
+      <h1 class="text-[clamp(2.6rem,6vw,4.25rem)] font-extrabold">Player guide</h1>
+      <p class="lede mt-4">
+        Everything for your first days on Cherry Creek. Tick off the checklist, plan your first
+        claim, and look up any command when you need it.
+      </p>
+      <div class="mt-10 max-w-3xl">
+        <Checklist />
+      </div>
+    </div>
+  </div>
+
+  <div class="shell grid grid-cols-[minmax(0,1fr)] gap-x-16 pb-24 lg:grid-cols-[13rem_minmax(0,1fr)]">
+    <nav class="toc" aria-labelledby="toc-heading" data-toc>
+      <h2 id="toc-heading" class="font-sans text-sm font-medium tracking-normal text-silver">
+        On this page
+      </h2>
+      <ul class="mt-3">
+        {sections.map((section) => (
+          <li>
+            <a href={`#${section.id}`}>{section.label}</a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <div class="prose">
+      <h2 id="joining">Joining</h2>
+      <p>
+        Cherry Creek is a whitelisted server, so an administrator needs to approve you before you
+        can connect.
+      </p>
+      <ol>
         <li>
-          <a class="link" href={`#${section.id}`}>
-            {section.label}
+          Join the{' '}
+          <a href={site.discordUrl} target="_blank" rel="noopener">
+            Cherry Creek Discord
           </a>
+          .
         </li>
-      ))}
-    </ul>
-  </nav>
+        <li>
+          Contact the community administrators about whitelist access. Joining Discord does not add
+          you automatically.
+        </li>
+        <li>Open Minecraft Java Edition.</li>
+        <li>In Multiplayer, choose Add Server and enter the address below.</li>
+        <li>Once you are approved, connect and begin your adventure.</li>
+      </ol>
+      <div class="not-prose max-w-sm">
+        <CopyAddress />
+      </div>
 
-  <h2 id="joining">Joining</h2>
-  <p>
-    Cherry Creek is a whitelisted server, so an administrator needs to approve you before you can
-    connect.
-  </p>
-  <ol>
-    <li>
-      Join the{' '}
-      <a href={site.discordUrl} target="_blank" rel="noopener">
-        Cherry Creek Discord
-      </a>
-      .
-    </li>
-    <li>
-      Contact the community administrators about whitelist access. Joining Discord does not add you
-      automatically.
-    </li>
-    <li>Open Minecraft Java Edition.</li>
-    <li>In Multiplayer, choose Add Server and enter the address below.</li>
-    <li>Once you are approved, connect and begin your adventure.</li>
-  </ol>
-  <div class="not-prose max-w-sm">
-    <CopyAddress />
-  </div>
-
-  <h2 id="getting-started">Getting started</h2>
-  <p>
-    When you join Cherry Creek for the first time, you'll receive a small starter kit containing:
-  </p>
-  <ul>
-    {starterKit.map((item) => (
-      <li>{item}</li>
-    ))}
-    <li>{euros(economy.startingBalance)} in starting money</li>
-  </ul>
-  <p>
-    From there, you're free to explore, gather resources, build your home and start your adventure.
-  </p>
-  <p>
-    The server runs Minecraft survival with a handful of plugins designed to improve everyday
-    gameplay without changing its core experience. You don't need to install anything on your
-    computer to use them.
-  </p>
-
-  <h2 id="claiming">Claiming land</h2>
-  <p>
-    Land protection is handled by GriefPrevention. Inside your claim, other players can't break or
-    place blocks, access your containers or interact with protected property unless you give them
-    permission.
-  </p>
-  <ul>
-    <li>
-      <strong>Create a claim</strong> by holding a golden shovel and right-clicking two opposite
-      corners of the area you want.
-    </li>
-    <li>
-      <strong>Inspect land</strong> by holding a stick and right-clicking the ground to see whether
-      it's claimed.
-    </li>
-    <li>
-      You start with <strong>{count(claims.startingBlocks)} claim blocks</strong>.
-    </li>
-    <li>
-      You earn <strong>{count(claims.blocksPerHour)} more for each eligible hour</strong> you play,
-      up to
-      <strong>{count(claims.maxAccruedBlocks)}</strong> accrued blocks.
-    </li>
-    <li>
-      Extra claim blocks cost <strong>{euros(economy.claimBlockPrice)} each</strong> in in-game
-      currency.
-    </li>
-    <li>
-      You can have up to <strong>{count(claims.maxClaims)} claims</strong>.
-    </li>
-    <li>Claims are not currently set to expire when you're inactive.</li>
-    <li>Claiming is available in the Overworld, not the Nether or End.</li>
-  </ul>
-
-  <h3 id="sharing">Sharing your claim</h3>
-  <p>You can give trusted players different levels of access:</p>
-  <div class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th scope="col">Command</th>
-          <th scope="col">Permission granted</th>
-        </tr>
-      </thead>
-      <tbody>
-        {trustCommands.map(([command, effect]) => (
-          <tr>
-            <td>
-              <code>{command}</code>
-            </td>
-            <td>{effect}</td>
-          </tr>
+      <h2 id="getting-started">Getting started</h2>
+      <p>The first time you join, you receive a small starter kit:</p>
+      <ul class="not-prose kit">
+        {starterKit.map((item) => (
+          <li>{item}</li>
         ))}
-      </tbody>
-    </table>
+        <li>{euros(economy.startingBalance)} in starting money</li>
+      </ul>
+      <p>
+        From there, you're free to explore, gather resources, build your home and start your
+        adventure.
+      </p>
+      <p>
+        The server runs Minecraft survival with a handful of plugins designed to improve everyday
+        gameplay without changing its core experience. You don't need to install anything on your
+        computer to use them.
+      </p>
+
+      <h2 id="claiming">Claiming land</h2>
+      <p>
+        Land protection is handled by GriefPrevention. Inside your claim, other players can't break
+        or place blocks, access your containers or interact with protected property unless you give
+        them permission.
+      </p>
+      <ul>
+        <li>
+          <strong>Create a claim</strong> by holding a golden shovel and right-clicking two opposite
+          corners of the area you want.
+        </li>
+        <li>
+          <strong>Inspect land</strong> by holding a stick and right-clicking the ground to see
+          whether it's claimed.
+        </li>
+        <li>
+          <strong>Your first chest claims land for you.</strong>
+          {firstChestNote}
+        </li>
+        <li>
+          You start with <strong>{count(claims.startingBlocks)} claim blocks</strong>.
+        </li>
+        <li>
+          You earn <strong>{count(claims.blocksPerHour)} more for each eligible hour</strong> you
+          play, up to
+          <strong>{count(claims.maxAccruedBlocks)}</strong> accrued blocks.
+        </li>
+        <li>
+          Extra claim blocks cost <strong>{euros(economy.claimBlockPrice)} each</strong> in in-game
+          currency.
+        </li>
+        <li>
+          You can have up to <strong>{count(claims.maxClaims)} claims</strong>.
+        </li>
+        <li>Claims are not currently set to expire when you're inactive.</li>
+        <li>
+          A claim must be at least <strong>{claims.minWidth} blocks wide</strong> and cover at least
+          <strong>{count(claims.minArea)} blocks</strong>.
+        </li>
+        <li>Claiming is available in the Overworld, not the Nether or End.</li>
+      </ul>
+
+      <ClaimPlanner />
+
+      <h3 id="sharing">Sharing your claim</h3>
+      <p>You can give trusted players different levels of access, from least to most:</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Command</th>
+              <th scope="col">Permission granted</th>
+            </tr>
+          </thead>
+          <tbody>
+            {trustLevels.map((level) => (
+              <tr>
+                <td>
+                  <code>{level.command}</code>
+                </td>
+                <td>{level.grants}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p class="callout">
+        Be careful when granting full trust. Only give building permissions to people you trust with
+        your creations.
+      </p>
+
+      <h2 id="economy">The economy</h2>
+      <p>
+        Cherry Creek uses EssentialsX, VaultUnlocked and EconomyShopGUI for its in-game economy.
+      </p>
+      <p>
+        Every player starts with <strong>{euros(economy.startingBalance)}</strong>. You can earn
+        additional money by selling items, spend it in the server shops or transfer money to other
+        players.
+      </p>
+      <ul>
+        <li>
+          Open the shop using <code>/shop</code> or <code>/market</code>.
+        </li>
+        <li>Buy items using the shop interface.</li>
+        <li>
+          Sell items using the shop interface, <code>/sellgui</code> or <code>/sellall</code>.
+        </li>
+        <li>
+          Check your balance using <code>/balance</code>.
+        </li>
+        <li>
+          Send money using <code>/pay &lt;player&gt; &lt;amount&gt;</code>.
+        </li>
+        <li>
+          Purchase claim blocks using <code>/buyclaimblocks &lt;amount&gt;</code>.
+        </li>
+      </ul>
+      <p>Items bought from the shop may include additional informational lore.</p>
+      <p class="callout">
+        Euros on Cherry Creek are a fictional in-game currency. They are not real money, payments or
+        cryptocurrency.
+      </p>
+
+      <h2 id="homes">Homes and teleportation</h2>
+      <p>
+        EssentialsX makes it easier to travel around the world without constantly walking back to
+        your base.
+      </p>
+      <ul>
+        <li>
+          Save a home with <code>/sethome</code>.
+        </li>
+        <li>
+          Create a named home with <code>/sethome &lt;name&gt;</code>, if your home limit allows it.
+        </li>
+        <li>
+          Return home with <code>/home</code> or <code>/home &lt;name&gt;</code>.
+        </li>
+        <li>
+          Remove a home with <code>/delhome &lt;name&gt;</code>.
+        </li>
+        <li>
+          Request a teleport using <code>/tpa &lt;player&gt;</code>.
+        </li>
+        <li>
+          Accept or decline requests using <code>/tpaccept</code> or <code>/tpdeny</code>.
+        </li>
+      </ul>
+      <p>
+        Multiple named homes may be available depending on your permissions. Teleportation may also
+        have short delays or cooldowns to keep survival gameplay balanced.
+      </p>
+      <ul>
+        <li>
+          To use <code>/sethome</code> inside another player's claim, you need at least access trust
+          from them.
+        </li>
+        <li>
+          <code>/home</code> and <code>/tpa</code>
+          {combatNote}
+        </li>
+      </ul>
+      <p class="callout">Set a home early in your adventure. It's a long walk back otherwise.</p>
+
+      <h2 id="mining">Mining and equipment</h2>
+      <h3 id="veinminer">VeinMiner</h3>
+      <p>
+        VeinMiner breaks a whole connected group of blocks in one go. On Cherry Creek it works on
+        <strong>natural logs and coal veins only</strong>: fell a tree or clear a coal vein without
+        breaking every block yourself. Everything else is mined the usual way.
+      </p>
+      <p>
+        It's there to make repetitive work more convenient, not to bypass protected claims. Your
+        tool may still lose durability for the blocks mined.
+      </p>
+
+      <h3 id="toolstats">ToolStats</h3>
+      <p>
+        ToolStats automatically records statistics on supported tools, weapons and equipment.
+        Depending on the item, this can include:
+      </p>
+      <ul>
+        <li>Blocks mined.</li>
+        <li>Mobs defeated.</li>
+        <li>Damage dealt.</li>
+        <li>Crops harvested.</li>
+        <li>Fish caught.</li>
+        <li>Other equipment-related achievements.</li>
+      </ul>
+      <p>
+        Statistics are stored on the items themselves and can appear in their descriptions. It's a
+        fun way to see how much history your favourite pickaxe or sword has accumulated.
+      </p>
+
+      <h2 id="map">The world map</h2>
+      <p>
+        Cherry Creek has its own interactive 3D map, powered by BlueMap. It also includes a
+        GriefPrevention claim overlay, so you can see protected land and existing claims.
+      </p>
+      <p class="not-prose">
+        <a href={site.mapUrl} class="btn btn-quiet" target="_blank" rel="noopener">
+          Open the interactive map<span class="sr-only"> (opens in a new tab)</span>
+        </a>
+      </p>
+      <p>
+        Only explored and rendered terrain appears on the map, so unexplored areas may not be
+        visible yet.
+      </p>
+      <p class="callout">
+        Keep in mind that buildings and claim locations visible on the map may also be visible to
+        other visitors.
+      </p>
+
+      <h2 id="doors">Doors and buildings</h2>
+      <p>DoorsReloaded adds several convenient improvements to doors and entrances.</p>
+      <ul>
+        <li>
+          <strong>Double doors</strong> can open and close together.
+        </li>
+        <li>
+          <strong>Knocking</strong> lets you knock on supported doors, trapdoors and gates by
+          left-clicking.
+        </li>
+        <li>
+          <strong>Redstone integration</strong> helps paired doors work together.
+        </li>
+        <li>
+          <strong>Automatic closing</strong> may be available depending on the server configuration.
+        </li>
+      </ul>
+      <p>Protected doors still follow land-claim permissions.</p>
+
+      <h2 id="commands">Command finder</h2>
+      <p>
+        The main commands you'll use on Cherry Creek. Some features may depend on permissions or the
+        server's current configuration.
+      </p>
+      <CommandFinder />
+      <p class="callout">
+        Be careful with <code>/abandonclaim</code>. Removing a claim also removes its land
+        protection.
+      </p>
+    </div>
   </div>
-  <p>
-    Be careful when granting full trust. Only give building permissions to people you trust with
-    your creations.
-  </p>
 
-  <h2 id="economy">The economy</h2>
-  <p>Cherry Creek uses EssentialsX, VaultUnlocked and EconomyShopGUI for its in-game economy.</p>
-  <p>
-    Every player starts with <strong>{euros(economy.startingBalance)}</strong>. You can earn
-    additional money by selling items, spend it in the server shops or transfer money to other
-    players.
-  </p>
-  <ul>
-    <li>
-      Open the shop using <code>/shop</code> or <code>/market</code>.
-    </li>
-    <li>Buy items using the shop interface.</li>
-    <li>
-      Sell items using the shop interface, <code>/sellgui</code> or <code>/sellall</code>.
-    </li>
-    <li>
-      Check your balance using <code>/balance</code>.
-    </li>
-    <li>
-      Send money using <code>/pay &lt;player&gt; &lt;amount&gt;</code>.
-    </li>
-    <li>
-      Purchase claim blocks using <code>/buyclaimblocks &lt;amount&gt;</code>.
-    </li>
-  </ul>
-  <p>Items bought from the shop may include additional informational lore.</p>
-  <p>
-    Euros on Cherry Creek are a fictional in-game currency. They are not real money, payments or
-    cryptocurrency.
-  </p>
-
-  <h2 id="homes">Homes and teleportation</h2>
-  <p>
-    EssentialsX makes it easier to travel around the world without constantly walking back to your
-    base.
-  </p>
-  <ul>
-    <li>
-      Save a home with <code>/sethome</code>.
-    </li>
-    <li>
-      Create a named home with <code>/sethome &lt;name&gt;</code>, if your home limit allows it.
-    </li>
-    <li>
-      Return home with <code>/home</code> or <code>/home &lt;name&gt;</code>.
-    </li>
-    <li>
-      Remove a home with <code>/delhome &lt;name&gt;</code>.
-    </li>
-    <li>
-      Request a teleport using <code>/tpa &lt;player&gt;</code>.
-    </li>
-    <li>
-      Accept or decline requests using <code>/tpaccept</code> or <code>/tpdeny</code>.
-    </li>
-  </ul>
-  <p>
-    Multiple named homes may be available depending on your permissions. Teleportation may also have
-    short delays or cooldowns to keep survival gameplay balanced.
-  </p>
-  <p>Remember to establish a home early in your adventure!</p>
-
-  <h2 id="mining">Mining and equipment</h2>
-  <h3 id="veinminer">VeinMiner</h3>
-  <p>
-    Cherry Creek includes VeinMiner, allowing connected blocks of supported types to be mined more
-    efficiently. Rather than breaking every ore individually, VeinMiner can mine a connected vein in
-    one operation.
-  </p>
-  <p>
-    Supported materials and activation behaviour depend on the server configuration. The feature is
-    intended to make repetitive mining more convenient, not bypass protected claims. Your tool may
-    still lose durability for the blocks mined.
-  </p>
-
-  <h3 id="toolstats">ToolStats</h3>
-  <p>
-    ToolStats automatically records statistics on supported tools, weapons and equipment. Depending
-    on the item, this can include:
-  </p>
-  <ul>
-    <li>Blocks mined.</li>
-    <li>Mobs defeated.</li>
-    <li>Damage dealt.</li>
-    <li>Crops harvested.</li>
-    <li>Fish caught.</li>
-    <li>Other equipment-related achievements.</li>
-  </ul>
-  <p>
-    Statistics are stored on the items themselves and can appear in their descriptions. It's a fun
-    way to see how much history your favourite pickaxe or sword has accumulated.
-  </p>
-
-  <h2 id="exploring">Exploring the world</h2>
-  <h3 id="biomes">BiomeAnnouncer</h3>
-  <p>
-    BiomeAnnouncer displays notifications when you enter different Minecraft biomes. You can choose
-    how frequently these notifications appear:
-  </p>
-  <ul>
-    <li>
-      <code>/ba mode every</code> announces every biome you enter.
-    </li>
-    <li>
-      <code>/ba mode new</code> announces only biomes you haven't discovered before.
-    </li>
-    <li>
-      <code>/ba mode none</code> disables biome announcements.
-    </li>
-    <li>
-      <code>/ba discovered</code> shows your discovered biomes.
-    </li>
-    <li>
-      <code>/ba current</code> checks your current biome.
-    </li>
-  </ul>
-  <p>Discovering new environments is part of the adventure!</p>
-
-  <h3 id="map">Interactive world map</h3>
-  <p>
-    Cherry Creek has its own interactive 3D map, powered by BlueMap. Visit the
-    <a href={site.mapUrl} target="_blank" rel="noopener">
-      interactive map
-    </a>{' '}
-    to explore a rendered view of the world.
-  </p>
-  <p>
-    The map also includes a GriefPrevention claim overlay, allowing you to see protected land and
-    existing claims. Only explored and rendered terrain appears on the map, so unexplored areas may
-    not be visible yet.
-  </p>
-  <p>
-    Keep in mind that buildings and claim locations visible on the map may also be visible to other
-    visitors.
-  </p>
-
-  <h2 id="doors">Doors and buildings</h2>
-  <p>DoorsReloaded adds several convenient improvements to doors and entrances.</p>
-  <ul>
-    <li>
-      <strong>Double doors</strong> can open and close together.
-    </li>
-    <li>
-      <strong>Knocking</strong> lets you knock on supported doors, trapdoors and gates by
-      left-clicking.
-    </li>
-    <li>
-      <strong>Redstone integration</strong> helps paired doors work together.
-    </li>
-    <li>
-      <strong>Automatic closing</strong> may be available depending on the server configuration.
-    </li>
-  </ul>
-  <p>Protected doors still follow land-claim permissions.</p>
-
-  <h2 id="villagers">Villagers</h2>
-  <p>
-    Cherry Creek includes Villagers With Names, which gives villagers names to make villages feel a
-    little more alive.
-  </p>
-  <p>
-    You can still trade with villagers normally, although villagers inside another player's claim
-    may be protected. Please respect other players' villagers, trading halls and farms.
-  </p>
-
-  <h2 id="discord">Discord integration</h2>
-  <p>
-    Cherry Creek uses DiscordSRV to connect Minecraft with our Discord community. The integration
-    includes:
-  </p>
-  <ul>
-    <li>Messages shared between Minecraft and the #minecraft Discord channel.</li>
-    <li>Player join and leave announcements.</li>
-    <li>Death notifications.</li>
-    <li>Advancement announcements.</li>
-    <li>Server shop transaction notifications.</li>
-    <li>Optional Minecraft and Discord account linking.</li>
-  </ul>
-  <p>
-    To link your Minecraft account, use <code>/discord link</code> and follow the instructions to
-    send your linking code to the Cherry Creek Discord bot. Once your accounts are linked, you can
-    receive the Minecrafter Discord role.
-  </p>
-  <p>
-    Account linking is optional and does not replace the server's whitelist. You can also use
-    <code>/discord</code> to find the community invitation.
-  </p>
-
-  <h2 id="commands">Useful commands</h2>
-  <p>
-    These are the main commands you'll use while playing Cherry Creek. Some features may depend on
-    permissions or the server's current configuration.
-  </p>
-  <div class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th scope="col">Command</th>
-          <th scope="col">What it does</th>
-        </tr>
-      </thead>
-      <tbody>
-        {commands.map(([command, effect]) => (
-          <tr>
-            <td>
-              <code>{command}</code>
-            </td>
-            <td>{effect}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-  <p>
-    <strong>Tip:</strong> be careful with <code>/abandonclaim</code>. Removing a claim also removes
-    its land protection.
-  </p>
-</Page>
+  <script>
+    import '@/scripts/guide.ts';
+  </script>
+</Base>
 
 <style>
+  .page-top {
+    background:
+      radial-gradient(40rem 20rem at 85% 0%, rgb(232 141 165 / 0.16), transparent 70%),
+      radial-gradient(34rem 18rem at 20% 0%, rgb(142 213 163 / 0.1), transparent 70%);
+  }
+
+  /* Contents: a box above the text on small screens, a sticky rail on large ones. */
   .toc {
-    margin-bottom: 0.5rem;
-    padding: 1.25rem 1.5rem;
+    margin-bottom: 1rem;
+    padding: 1.1rem 1.4rem;
     border: 1px solid var(--line);
     border-radius: 1.25rem;
     background: rgb(244 245 244 / 0.03);
   }
-  /* Wide command tables scroll inside their own box on narrow screens. */
+  .toc ul {
+    display: grid;
+    gap: 0.1rem 2rem;
+  }
+  @media (min-width: 30rem) {
+    .toc ul {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  .toc a {
+    display: block;
+    padding: 0.3rem 0.75rem;
+    margin-left: -0.75rem;
+    border-left: 2px solid transparent;
+    color: var(--color-silver);
+    transition: color 0.2s;
+  }
+  .toc a:hover {
+    color: var(--color-snow);
+  }
+  .toc a[aria-current] {
+    color: var(--color-snow);
+    border-left-color: var(--color-meadow);
+  }
+  @media (min-width: 64rem) {
+    .toc {
+      position: sticky;
+      top: 7rem;
+      align-self: start;
+      margin: 3rem 0 0;
+      padding: 0;
+      border: 0;
+      background: none;
+    }
+    .toc ul {
+      grid-template-columns: 1fr;
+    }
+    .toc a {
+      margin-left: 0;
+      border-left-color: var(--line);
+    }
+  }
+
+  .kit {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .kit li {
+    padding: 0.4rem 0.9rem;
+    border-radius: 999px;
+    border: 1px solid var(--line-strong);
+    background: rgb(244 245 244 / 0.04);
+    color: var(--color-snow);
+  }
+
+  .callout {
+    padding: 0.8rem 1.1rem;
+    border-left: 3px solid var(--color-gold);
+    border-radius: 0 0.9rem 0.9rem 0;
+    background: rgb(245 201 106 / 0.07);
+    color: var(--color-sand);
+  }
+
+  .prose :global([data-planner]) {
+    margin-block: 2rem;
+  }
+
+  /* Wide tables scroll inside their own box on narrow screens. */
   .table-wrap {
     overflow-x: auto;
   }
