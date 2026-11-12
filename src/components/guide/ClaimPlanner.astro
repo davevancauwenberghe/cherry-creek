@@ -4,7 +4,7 @@
  * Figures come from src/config/server.ts; the maths runs in src/scripts/guide.ts.
  * Hidden until JavaScript is available, since it does nothing without it.
  */
-import { count, euros, server } from '@/config/server';
+import { autoClaimArea, autoClaimSide, count, euros, server } from '@/config/server';
 
 const { claims, economy } = server;
 ---
@@ -19,6 +19,7 @@ const { claims, economy } = server;
   data-price={economy.claimBlockPrice}
   data-min-width={claims.minWidth}
   data-min-area={claims.minArea}
+  data-starter-area={autoClaimArea}
   hidden
 >
   <h3 id="planner-heading" class="text-[1.3rem] font-bold text-snow">
@@ -87,6 +88,17 @@ const { claims, economy } = server;
     </div>
   </div>
 
+  <label class="mt-5 flex cursor-pointer items-start gap-3 text-snow">
+    <input type="checkbox" class="planner-check mt-1" data-planner-starter />
+    <span>
+      I still have my automatic first-chest claim
+      <span class="block text-sm text-silver">
+        Placing your first chest claims {autoClaimSide} × {autoClaimSide} around it, which uses{' '}
+        {autoClaimArea} blocks.
+      </span>
+    </span>
+  </label>
+
   <dl class="mt-6 grid grid-cols-2 gap-4 border-t border-(--line) pt-5">
     <div>
       <dt class="text-sm text-silver">Claim needs</dt>
@@ -103,11 +115,11 @@ const { claims, economy } = server;
   </dl>
   <p class="planner-verdict mt-4" role="status" data-planner-verdict></p>
   <p class="mt-3 text-sm text-silver">
-    An estimate: it assumes none of your blocks are tied up in other claims. You start with{' '}
-    {count(claims.startingBlocks)} blocks and earn {count(claims.blocksPerHour)} per eligible hour,
-    up to {count(claims.maxAccruedBlocks)}. Extra blocks cost {euros(economy.claimBlockPrice)} each.
-    A claim must be at least {claims.minWidth} blocks wide and cover at least{' '}
-    {count(claims.minArea)} blocks.
+    An estimate: it assumes none of your blocks are tied up in other claims, apart from the
+    first-chest claim if you tick it. You start with {count(claims.startingBlocks)} blocks and earn{' '}
+    {count(claims.blocksPerHour)} per eligible hour, up to {count(claims.maxAccruedBlocks)}. Extra
+    blocks cost {euros(economy.claimBlockPrice)} each. A claim must be at least {claims.minWidth}{' '}
+    blocks wide and cover at least {count(claims.minArea)} blocks.
   </p>
 </section>
 
@@ -122,6 +134,12 @@ const { claims, economy } = server;
     color: var(--color-snow);
     font-family: var(--font-pixel);
     font-size: 1.15rem;
+  }
+  .planner-check {
+    width: 1.15rem;
+    height: 1.15rem;
+    flex-shrink: 0;
+    accent-color: var(--color-meadow);
   }
   .planner-range {
     accent-color: var(--color-meadow);

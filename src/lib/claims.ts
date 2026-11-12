@@ -19,7 +19,7 @@ export type ClaimPlan =
   | {
       ok: true;
       area: number;
-      /** Blocks the player has now: starting blocks plus what play has earned. */
+      /** Blocks free to use now: starting plus earned, minus those in other claims. */
       owned: number;
       /** Blocks still missing; zero or less means the claim fits. */
       short: number;
@@ -38,13 +38,15 @@ export function planClaim(
   length: number,
   hoursPlayed: number,
   limits: ClaimLimits,
+  /** Blocks already tied up in the player's other claims. */
+  usedBlocks = 0,
 ): ClaimPlan {
   const area = width * length;
   const accrued = Math.min(
     Math.max(hoursPlayed, 0) * limits.blocksPerHour,
     limits.maxAccruedBlocks,
   );
-  const owned = limits.startingBlocks + accrued;
+  const owned = Math.max(limits.startingBlocks + accrued - Math.max(usedBlocks, 0), 0);
 
   if (Math.min(width, length) < limits.minWidth)
     return { ok: false, reason: 'too-narrow', area, owned };

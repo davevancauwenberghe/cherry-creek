@@ -69,3 +69,14 @@ test('claims below the minimum width or area are rejected', () => {
   assert.equal(!small.ok && small.reason, 'too-small');
   assert.equal(planClaim(5, 20, 0, limits).ok, true);
 });
+
+test('blocks tied up in other claims reduce what is free', () => {
+  // The automatic first-chest claim (9 × 9) leaves 119 of the 200 starting blocks.
+  const plan = planClaim(10, 12, 0, limits, 81);
+  assert.ok(plan.ok);
+  assert.equal(plan.owned, 119);
+  assert.equal(plan.short, 1);
+  assert.equal(plan.hoursToEarn, 1);
+  assert.equal(planClaim(10, 10, 0, limits, 81).ok && planClaim(10, 10, 0, limits, 81).owned, 119);
+  assert.equal(planClaim(10, 10, 0, limits, 9999).owned, 0);
+});

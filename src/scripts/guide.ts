@@ -76,12 +76,15 @@ if (planner) {
   const width = planner.querySelector<HTMLInputElement>('[data-planner-width]')!;
   const length = planner.querySelector<HTMLInputElement>('[data-planner-length]')!;
   const hours = planner.querySelector<HTMLInputElement>('[data-planner-hours]')!;
+  const starter = planner.querySelector<HTMLInputElement>('[data-planner-starter]');
+  const starterArea = number('starterArea');
   const hoursOut = planner.querySelector('[data-planner-hours-out]')!;
   const needs = planner.querySelector('[data-planner-needs]')!;
   const has = planner.querySelector('[data-planner-has]')!;
   const verdict = planner.querySelector<HTMLElement>('[data-planner-verdict]')!;
 
   const format = (n: number) => n.toLocaleString('en-GB');
+  const blocksText = (n: number) => `${format(n)} ${n === 1 ? 'block' : 'blocks'}`;
   const hoursText = (n: number) => `${format(n)} more ${n === 1 ? 'hour' : 'hours'} of play`;
   const side = (input: HTMLInputElement) =>
     Math.min(500, Math.max(0, Math.floor(Number(input.value)) || 0));
@@ -93,21 +96,22 @@ if (planner) {
         : `Too small. A claim must cover at least ${format(limits.minArea)} blocks, for example 10 × 10.`;
     }
     if (plan.short === 0) return 'It fits exactly. Every block you have goes into this claim.';
-    if (plan.short < 0) return `It fits, with ${format(-plan.short)} blocks to spare.`;
+    if (plan.short < 0) return `It fits, with ${blocksText(-plan.short)} to spare.`;
 
     const buyAll = `€${format(plan.costToBuy)} with /buyclaimblocks ${plan.short}`;
     if (plan.hoursToEarn !== null) {
-      return `You're ${format(plan.short)} blocks short. That's about ${hoursText(plan.hoursToEarn)}, or ${buyAll}.`;
+      return `You're ${blocksText(plan.short)} short. That's about ${hoursText(plan.hoursToEarn)}, or ${buyAll}.`;
     }
     // Playing can never cover this: say so instead of quoting impossible hours.
     const limit = `Playing earns at most ${format(limits.maxAccruedBlocks)} blocks`;
     return plan.earnable === 0
-      ? `You're ${format(plan.short)} blocks short. ${limit} and you've reached that, so the rest has to be bought: ${buyAll}.`
-      : `You're ${format(plan.short)} blocks short. ${limit}, so even after earning the remaining ${format(plan.earnable)} you would have to buy ${format(plan.mustBuy)}. Buying the whole shortfall today costs ${buyAll}.`;
+      ? `You're ${blocksText(plan.short)} short. ${limit} and you've reached that, so the rest has to be bought: ${buyAll}.`
+      : `You're ${blocksText(plan.short)} short. ${limit}, so even after earning the remaining ${format(plan.earnable)} you would have to buy ${format(plan.mustBuy)}. Buying the whole shortfall today costs ${buyAll}.`;
   };
 
   const calculate = () => {
-    const plan = planClaim(side(width), side(length), Number(hours.value), limits);
+    const used = starter?.checked ? starterArea : 0;
+    const plan = planClaim(side(width), side(length), Number(hours.value), limits, used);
     hoursOut.textContent = hours.value;
     needs.textContent = plan.ok ? format(plan.area) : '–';
     has.textContent = format(plan.owned);

@@ -3,11 +3,16 @@ import CopyAddress from '@/components/CopyAddress.astro';
 import Checklist from '@/components/guide/Checklist.astro';
 import ClaimPlanner from '@/components/guide/ClaimPlanner.astro';
 import CommandFinder from '@/components/guide/CommandFinder.astro';
-import { count, euros, server } from '@/config/server';
+import { autoClaimArea, autoClaimSide, count, euros, server } from '@/config/server';
 import { site } from '@/config/site';
 import Base from '@/layouts/Base.astro';
 
 const { economy, claims, starterKit } = server;
+
+// Whole sentences are built here rather than mixing text and {expressions}
+// across line breaks in the template, where the space between them gets lost.
+const firstChestNote = `Placing it creates a ${autoClaimSide} × ${autoClaimSide} claim around it automatically, using ${autoClaimArea} of your claim blocks.`;
+const combatNote = `are blocked for ${server.pvp.combatTimeoutSeconds} seconds after fighting another player.`;
 
 const sections = [
   { id: 'joining', label: 'Joining' },
@@ -128,6 +133,10 @@ const trustLevels = [
           whether it's claimed.
         </li>
         <li>
+          <strong>Your first chest claims land for you.</strong>
+          {firstChestNote}
+        </li>
+        <li>
           You start with <strong>{count(claims.startingBlocks)} claim blocks</strong>.
         </li>
         <li>
@@ -241,6 +250,16 @@ const trustLevels = [
         Multiple named homes may be available depending on your permissions. Teleportation may also
         have short delays or cooldowns to keep survival gameplay balanced.
       </p>
+      <ul>
+        <li>
+          To use <code>/sethome</code> inside another player's claim, you need at least access trust
+          from them.
+        </li>
+        <li>
+          <code>/home</code> and <code>/tpa</code>
+          {combatNote}
+        </li>
+      </ul>
       <p class="callout">Set a home early in your adventure. It's a long walk back otherwise.</p>
 
       <h2 id="mining">Mining and equipment</h2>
