@@ -8,14 +8,22 @@ import Page from '@/layouts/Page.astro';
   description="What the Cherry Creek website does, and does not do, with your data."
   intro="A plain description of how this website works. It is a small community site, and it is built to collect as little as possible."
 >
-  <h2>What this website does not do</h2>
+  <h2>The short version</h2>
   <ul>
-    <li>It has no accounts, forms or comment sections, so there is nothing for you to submit.</li>
-    <li>It does not set cookies or use your browser's local storage.</li>
-    <li>It does not use analytics, advertising or tracking scripts.</li>
     <li>
-      It does not load fonts, scripts or images from other companies. Everything is served from this
-      site.
+      There are no accounts, forms or comment sections, so there is nothing for you to submit.
+    </li>
+    <li>The site sets no cookies and shows no advertising.</li>
+    <li>
+      It uses Cloudflare Web Analytics to count visits and measure how quickly pages load. This is
+      described below.
+    </li>
+    <li>
+      The player guide can remember which checklist steps you have ticked. That stays in your own
+      browser and is never sent anywhere.
+    </li>
+    <li>
+      Fonts, images and the site's own scripts are served from this site, not from other companies.
     </li>
   </ul>
 
@@ -27,18 +35,52 @@ import Page from '@/layouts/Page.astro';
     keep technical logs of requests for security and troubleshooting.
   </p>
 
+  <h2 id="analytics">Analytics</h2>
+  <p>
+    This site uses
+    <a href="https://www.cloudflare.com/web-analytics/" target="_blank" rel="noopener">
+      Cloudflare Web Analytics
+    </a>
+    to understand how it is used: which pages are viewed, roughly where visits come from (such as
+    the referring site and country), which kinds of browser and device are used, and how fast pages
+    load.
+  </p>
+  <p>
+    It works through a small script loaded from Cloudflare. According to Cloudflare, Web Analytics
+    does not use cookies or your browser's local storage, and does not fingerprint visitors by IP
+    address, browser details or other data in order to follow them. The figures are used only to
+    keep the site working well. They are not used for advertising and are not sold.
+  </p>
+  <p>
+    Content blockers that block Cloudflare's analytics script work here as usual, and the site
+    functions the same without it. Cloudflare's handling of this data is covered by the
+    <a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener">
+      Cloudflare privacy policy
+    </a>
+    .
+  </p>
+
+  <h2 id="storage">What is kept in your browser</h2>
+  <p>
+    The <a href="/guide">player guide</a> has a first-day checklist. If you tick a step, your
+    browser saves that in its local storage so the ticks are still there next time. Nothing is saved
+    until you tick something, it is never sent to this site or anyone else, and the checklist's
+    reset button, or clearing your browser's site data, removes it.
+  </p>
+
   <h2>Live server status</h2>
   <p>
     The status card asks this website's own server whether the Minecraft server is online. It shows
-    only the online state, the number of players, the player limit and the game version. It never
-    shows player names or IP addresses, and your browser never contacts the Minecraft server
-    directly.
+    only the online state, the number of players, the player limit, the game version, and how the
+    number of players has changed over the last 24 hours. These are totals only. The site never
+    shows or stores player names or IP addresses, and your browser never contacts the Minecraft
+    server directly.
   </p>
 
   <h2>Copying the server address</h2>
   <p>
-    The copy buttons write the server address to your clipboard when you press them. The website
-    cannot read what is on your clipboard.
+    The copy buttons write the server address, or a command from the guide, to your clipboard when
+    you press them. The website cannot read what is on your clipboard.
   </p>
 
   <h2>Links to other services</h2>

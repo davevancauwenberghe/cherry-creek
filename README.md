@@ -8,15 +8,15 @@ The official website for **Cherry Creek**, a small, whitelisted Minecraft Java E
 
 ## What's inside
 
-| Piece             | Choice                                                                              |
-| ----------------- | ----------------------------------------------------------------------------------- |
-| Framework         | [Astro 7](https://astro.build) with TypeScript, pages prerendered to static HTML    |
-| Styling           | Tailwind CSS 4 (design tokens in `src/styles/global.css`)                           |
-| Server            | Astro's standalone Node adapter, used only for `/api/status` and `/healthz`         |
-| Fonts             | Bricolage Grotesque, Geist and Pixelify Sans, self-hosted (no third-party requests) |
-| Client JavaScript | One ~5 kB bundle: copy buttons, live status, mobile menu, scroll reveals            |
+| Piece             | Choice                                                                                                                                               |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Framework         | [Astro 7](https://astro.build) with TypeScript, pages prerendered to static HTML                                                                     |
+| Styling           | Tailwind CSS 4 (design tokens in `src/styles/global.css`)                                                                                            |
+| Server            | Astro's standalone Node adapter, used only for `/api/status` and `/healthz`                                                                          |
+| Fonts             | Bricolage Grotesque, Geist and Pixelify Sans, self-hosted (no third-party requests)                                                                  |
+| Client JavaScript | One small bundle for copy buttons, live status, mobile menu and scroll reveals, plus one for the guide's checklist, claim planner and command finder |
 
-There is no database, CMS, analytics, cookie or secret.
+There is no database, CMS, cookie or secret. Visits are counted by Cloudflare Web Analytics, which is switched on in Cloudflare rather than in this code; `src/pages/privacy.astro` describes it.
 
 ## Requirements
 
@@ -107,6 +107,8 @@ Build-time values are baked into the static HTML, so changing them needs a rebui
 
 `players` is `null` when the server answers without usable counts, and the card shows a dash rather than `0 / 0`.
 
+The response also carries `activity`: the highest and lowest player counts the website has seen in the last 24 hours, plus a peak per half hour for the small chart on the status card. It is built only from the site's own checks, contains totals and nothing else, and is `null` until there is something to show. To cover hours when nobody visits, the server checks on its own every five minutes once the first visitor has arrived. The record is held in memory, so it starts again whenever the container restarts; the card then says "Players since …" instead of "Last 24 hours".
+
 How it works:
 
 - The server speaks Minecraft's standard **Server List Ping** over TCP, the same thing the multiplayer screen does. That one request provides availability, version and player counts, so **UDP Query and RCON are not used**.
@@ -192,7 +194,7 @@ HOST=127.0.0.1 PORT=18082 node dist/server/entry.mjs
 - [ ] Confirm the Discord invite in `PUBLIC_DISCORD_URL` is permanent (set to never expire).
 - [ ] Add real screenshots (optional; the illustrations are fine until then).
 - [ ] Read `src/pages/privacy.astro` against how the server is really configured, in particular Apache and Cloudflare logging.
-- [ ] In Cloudflare, switch off automatic Web Analytics (RUM) injection for `cherrycreek.app`, or update `src/pages/privacy.astro` to describe it. The privacy page says the site has no analytics, and the example Content Security Policy blocks the beacon script.
+- [ ] If the analytics provider ever changes from Cloudflare Web Analytics, update `src/pages/privacy.astro` and the Content Security Policy in the Apache example.
 - [ ] Copy the security headers from `deploy/apache-cherrycreek.app.conf.example` into the live vhost.
 
 ## Accessibility and performance notes

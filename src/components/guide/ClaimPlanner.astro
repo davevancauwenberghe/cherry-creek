@@ -1,0 +1,147 @@
+---
+/**
+ * Works out whether a planned claim fits a player's claim blocks.
+ * Figures come from src/config/server.ts; the maths runs in src/scripts/guide.ts.
+ * Hidden until JavaScript is available, since it does nothing without it.
+ */
+import { count, euros, server } from '@/config/server';
+
+const { claims, economy } = server;
+---
+
+<section
+  class="planner not-prose rounded-3xl border border-(--line) bg-slate/70 p-5 sm:p-7"
+  aria-labelledby="planner-heading"
+  data-planner
+  data-start={claims.startingBlocks}
+  data-per-hour={claims.blocksPerHour}
+  data-max-accrued={claims.maxAccruedBlocks}
+  data-price={economy.claimBlockPrice}
+  hidden
+>
+  <h3 id="planner-heading" class="text-[1.3rem] font-bold text-snow">
+    Will my claim fit?
+  </h3>
+  <p class="mt-1 text-silver">
+    A claim uses one claim block for every block of ground it covers. Try the size you have in mind.
+  </p>
+
+  <div class="mt-5 grid gap-5 sm:grid-cols-[1fr_1fr]">
+    <fieldset>
+      <legend class="text-sm text-silver">Claim size, in blocks</legend>
+      <div class="mt-2 flex items-center gap-2">
+        <label class="sr-only" for="planner-width">
+          Width
+        </label>
+        <input
+          id="planner-width"
+          class="planner-number"
+          type="number"
+          inputmode="numeric"
+          min="1"
+          max="500"
+          value="20"
+          data-planner-width
+        />
+        <span class="text-silver" aria-hidden="true">
+          ×
+        </span>
+        <label class="sr-only" for="planner-length">
+          Length
+        </label>
+        <input
+          id="planner-length"
+          class="planner-number"
+          type="number"
+          inputmode="numeric"
+          min="1"
+          max="500"
+          value="20"
+          data-planner-length
+        />
+      </div>
+    </fieldset>
+
+    <div>
+      <label
+        class="flex items-baseline justify-between gap-3 text-sm text-silver"
+        for="planner-hours"
+      >
+        Hours played so far
+        <output class="pixel text-lg text-snow" for="planner-hours" data-planner-hours-out>
+          0
+        </output>
+      </label>
+      <input
+        id="planner-hours"
+        class="planner-range mt-3 w-full"
+        type="range"
+        min="0"
+        max="100"
+        step="1"
+        value="0"
+        data-planner-hours
+      />
+    </div>
+  </div>
+
+  <dl class="mt-6 grid grid-cols-2 gap-4 border-t border-(--line) pt-5">
+    <div>
+      <dt class="text-sm text-silver">Claim needs</dt>
+      <dd class="planner-figure" data-planner-needs>
+        400
+      </dd>
+    </div>
+    <div>
+      <dt class="text-sm text-silver">You have</dt>
+      <dd class="planner-figure" data-planner-has>
+        {count(claims.startingBlocks)}
+      </dd>
+    </div>
+  </dl>
+  <p class="planner-verdict mt-4" role="status" data-planner-verdict></p>
+  <p class="mt-3 text-sm text-silver">
+    An estimate: it assumes none of your blocks are tied up in other claims. You start with{' '}
+    {count(claims.startingBlocks)}
+    blocks, earn {count(claims.blocksPerHour)} per eligible hour, and extra blocks cost{' '}
+    {euros(economy.claimBlockPrice)}
+    each.
+  </p>
+</section>
+
+<style>
+  .planner-number {
+    width: 5.5rem;
+    min-height: 2.75rem;
+    padding: 0.4rem 0.7rem;
+    border-radius: 0.75rem;
+    border: 1px solid var(--line-strong);
+    background: rgb(13 21 24 / 0.6);
+    color: var(--color-snow);
+    font-family: var(--font-pixel);
+    font-size: 1.15rem;
+  }
+  .planner-range {
+    accent-color: var(--color-meadow);
+    height: 1.5rem;
+  }
+  .planner-figure {
+    font-family: var(--font-display);
+    font-variation-settings: 'opsz' 96;
+    font-size: 1.9rem;
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--color-snow);
+  }
+  .planner-verdict {
+    padding: 0.75rem 1rem;
+    border-radius: 1rem;
+    border: 1px solid rgb(142 213 163 / 0.3);
+    background: rgb(142 213 163 / 0.08);
+    color: var(--color-snow);
+  }
+  .planner-verdict[data-short] {
+    border-color: rgb(245 201 106 / 0.3);
+    background: rgb(245 201 106 / 0.07);
+  }
+</style>

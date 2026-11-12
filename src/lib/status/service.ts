@@ -21,6 +21,50 @@ export interface PublicStatus {
   lastSuccessAt: string | null;
   /** How long clients may reuse this answer, in seconds. */
   ttl: number;
+  /** Player counts the website has observed recently, or null if none yet. */
+  activity: Activity | null;
+}
+
+/**
+ * A rolling record of player counts, built only from this site's own status
+ * checks. Counts are anonymous totals: no names or identifiers are involved.
+ * It lives in memory, so it starts again whenever the website restarts.
+ */
+export interface Activity {
+  /** ISO time of the oldest observation still in the window. */
+  since: string;
+  /** Highest and lowest player counts seen in the window. */
+  peak: number;
+  low: number;
+  /** Peak count per half hour, oldest first. Null where nothing was observed. */
+  buckets: (number | null)[];
+}
+
+export const ACTIVITY_WINDOW_MS = 24 * 60 * 60 * 1000;
+export const ACTIVITY_BUCKET_MS = 30 * 60 * 1000;
+/** How often the server checks on its own, so quiet hours are still recorded. */
+export const SAMPLE_INTERVAL_MS = 5 * 60 * 1000;
+
+interface Sample {
+  at: number;
+  online: number;
+}
+
+export function summariseActivity(samples: Sample[], now: number): Activity | null {
+  const recent = samples.filter((s) => now - s.at < ACTIVITY_WINDOW_MS);
+  if (recent.length === 0) return null;
+  const buckets: (number | null)[] = new Array(ACTIVITY_WINDOW_MS / ACTIVITY_BUCKET_MS).fill(null);
+  for (const sample of recent) {
+    const index = buckets.length - 1 - Math.floor((now - sample.at) / ACTIVITY_BUCKET_MS);
+    buckets[index] = Math.max(buckets[index] ?? 0, sample.online);
+  }
+  const counts = recent.map((s) => s.online);
+  return {
+    since: new Date(Math.min(...recent.map((s) => s.at))).toISOString(),
+    peak: Math.max(...counts),
+    low: Math.min(...counts),
+    buckets,
+  };
 }
 
 type Ping = (options: PingOptions) => Promise<PingResult>;
@@ -29,6 +73,13 @@ export function createStatusService(config: StatusConfig, ping: Ping = pingServe
   let cached: { status: PublicStatus; expires: number } | null = null;
   let inFlight: Promise<PublicStatus> | null = null;
   let lastSuccessAt: string | null = null;
+  let samples: Sample[] = [];
+  let sampler: NodeJS.Timeout | null = null;
+
+  function record(online: number, at: number) {
+    samples = samples.filter((s) => at - s.at < ACTIVITY_WINDOW_MS);
+    samples.push({ at, online });
+  }
 
   async function probe(): Promise<PublicStatus> {
     const ttl = Math.round(config.cacheMs / 1000);
@@ -41,6 +92,8 @@ export function createStatusService(config: StatusConfig, ping: Ping = pingServe
         timeoutMs: config.timeoutMs,
       });
       lastSuccessAt = checkedAt;
+      const now = Date.parse(checkedAt);
+      if (result.players) record(result.players.online, now);
       return {
         state: 'online',
         players: result.players,
@@ -48,6 +101,7 @@ export function createStatusService(config: StatusConfig, ping: Ping = pingServe
         checkedAt,
         lastSuccessAt,
         ttl,
+        activity: summariseActivity(samples, now),
       };
     } catch (error) {
       // A refused connection means the machine answered but nothing is
@@ -61,6 +115,7 @@ export function createStatusService(config: StatusConfig, ping: Ping = pingServe
         checkedAt,
         lastSuccessAt,
         ttl,
+        activity: summariseActivity(samples, Date.parse(checkedAt)),
       };
     }
   }
@@ -75,6 +130,7 @@ export function createStatusService(config: StatusConfig, ping: Ping = pingServe
           checkedAt: new Date().toISOString(),
           lastSuccessAt: null,
           ttl: 3600,
+          activity: null,
         };
       }
       if (cached && cached.expires > Date.now()) return cached.status;
@@ -87,6 +143,17 @@ export function createStatusService(config: StatusConfig, ping: Ping = pingServe
           inFlight = null;
         });
       return inFlight;
+    },
+
+    /**
+     * Checks the server on a timer so the activity record covers hours when
+     * nobody is visiting the website. Safe to call repeatedly.
+     */
+    startSampling(): void {
+      if (!config.enabled || sampler) return;
+      sampler = setInterval(() => void this.get().catch(() => {}), SAMPLE_INTERVAL_MS);
+      // Never keep the process alive just for this.
+      sampler.unref();
     },
   };
 }

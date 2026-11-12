@@ -1,0 +1,97 @@
+---
+/**
+ * First-day checklist. Ticks are remembered in the browser's localStorage by
+ * src/scripts/guide.ts and never leave the device.
+ */
+import { site } from '@/config/site';
+
+const steps = [
+  { id: 'whitelist', label: 'Join the Discord and ask for whitelist access', href: '#joining' },
+  { id: 'connect', label: `Add ${site.serverAddress} and connect`, href: '#joining' },
+  { id: 'home', label: 'Set your first home', href: '#homes' },
+  { id: 'claim', label: 'Claim the land you build on', href: '#claiming' },
+  { id: 'shop', label: 'Check your balance and visit the shop', href: '#economy' },
+  { id: 'map', label: 'Find your base on the map', href: '#map' },
+];
+---
+
+<section
+  class="checklist glass rounded-3xl p-5 sm:p-7"
+  aria-labelledby="checklist-heading"
+  data-checklist
+>
+  <div class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
+    <h2 id="checklist-heading" class="text-[1.45rem] font-bold">
+      Your first day
+    </h2>
+    <p class="text-sm text-silver" role="status">
+      <span data-checklist-count>0</span> of {steps.length} done
+    </p>
+  </div>
+  <div class="mt-3 h-1.5 overflow-hidden rounded-full bg-snow/10" aria-hidden="true">
+    <div class="checklist-bar h-full rounded-full bg-meadow" data-checklist-bar></div>
+  </div>
+
+  <ul class="mt-4 grid gap-x-8 sm:grid-cols-2">
+    {steps.map((step) => (
+      <li class="flex items-center gap-3 border-b border-(--line) py-2.5">
+        <input type="checkbox" id={`step-${step.id}`} data-step={step.id} class="checklist-box" />
+        <label for={`step-${step.id}`} class="flex-1 cursor-pointer">
+          {step.label}
+        </label>
+        <a href={step.href} class="link shrink-0 text-sm" aria-label={`How to: ${step.label}`}>
+          How
+        </a>
+      </li>
+    ))}
+  </ul>
+
+  <div class="mt-4 flex min-h-6 flex-wrap items-center justify-between gap-3 text-sm text-silver">
+    <p data-checklist-message>Tick things off as you go. Your browser remembers them.</p>
+    <button type="button" class="link" data-checklist-reset hidden>
+      Start over
+    </button>
+  </div>
+</section>
+
+<style>
+  .checklist-bar {
+    width: 0;
+    transition: width 0.5s var(--ease-out-soft);
+  }
+  .checklist-box {
+    appearance: none;
+    flex-shrink: 0;
+    width: 1.35rem;
+    height: 1.35rem;
+    border: 1.5px solid rgb(244 245 244 / 0.4);
+    border-radius: 0.4rem;
+    cursor: pointer;
+    display: grid;
+    place-content: center;
+    transition:
+      background-color 0.2s,
+      border-color 0.2s;
+  }
+  .checklist-box::after {
+    content: '';
+    width: 0.7rem;
+    height: 0.4rem;
+    border-left: 2.5px solid #0f2a19;
+    border-bottom: 2.5px solid #0f2a19;
+    transform: translateY(-1px) rotate(-45deg) scale(0);
+    transition: transform 0.2s var(--ease-out-soft);
+  }
+  .checklist-box:checked {
+    background: var(--color-meadow);
+    border-color: var(--color-meadow);
+  }
+  .checklist-box:checked::after {
+    transform: translateY(-1px) rotate(-45deg) scale(1);
+  }
+  .checklist-box:checked + label {
+    color: var(--color-silver);
+    text-decoration: line-through;
+    text-decoration-color: rgb(169 181 181 / 0.6);
+  }
+</style>

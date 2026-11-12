@@ -42,7 +42,7 @@ document.addEventListener('click', async (event) => {
 
   if (ok) button.setAttribute('data-copied', '');
   if (label) label.textContent = ok ? 'Copied' : 'Copy failed';
-  announce(ok ? `Copied ${text} to the clipboard` : `Could not copy. The address is ${text}`);
+  announce(ok ? `Copied ${text.trim()} to the clipboard` : `Could not copy ${text.trim()}`);
 
   window.clearTimeout(timers.get(button));
   timers.set(
