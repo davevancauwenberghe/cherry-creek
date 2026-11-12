@@ -48,23 +48,6 @@ const { class: className } = Astro.props;
     </div>
   </dl>
 
-  <div class="mt-5 border-t border-(--line) pt-4" data-status-activity hidden>
-    <div class="flex items-baseline justify-between gap-4 text-sm">
-      <p class="text-silver" data-activity-range>
-        Last 24 hours
-      </p>
-      <p class="font-medium text-snow" data-activity-summary></p>
-    </div>
-    <svg
-      class="activity-chart mt-3 block h-8 w-full"
-      viewBox="0 0 192 32"
-      preserveAspectRatio="none"
-      aria-hidden="true"
-      focusable="false"
-      data-activity-chart
-    ></svg>
-  </div>
-
   <CopyAddress class="mt-5" />
 
   <p class="mt-3 min-h-5 text-sm text-silver" data-status-note>
@@ -73,12 +56,6 @@ const { class: className } = Astro.props;
 </section>
 
 <style>
-  .activity-chart :global(rect) {
-    fill: var(--color-meadow);
-  }
-  .activity-chart :global(rect[data-empty]) {
-    fill: rgb(244 245 244 / 0.16);
-  }
   .status-dot {
     background: var(--color-silver);
   }

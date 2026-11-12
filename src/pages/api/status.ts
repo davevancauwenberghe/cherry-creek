@@ -4,8 +4,6 @@ import { statusService } from '@/lib/status/index.ts';
 export const prerender = false;
 
 export const GET: APIRoute = async () => {
-  // Begins on the first request rather than at import, so builds never probe.
-  statusService.startSampling();
   const status = await statusService.get();
   return new Response(JSON.stringify(status), {
     headers: {
