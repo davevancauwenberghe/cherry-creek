@@ -143,6 +143,10 @@ const trustLevels = [
           You can have up to <strong>{count(claims.maxClaims)} claims</strong>.
         </li>
         <li>Claims are not currently set to expire when you're inactive.</li>
+        <li>
+          A claim must be at least <strong>{claims.minWidth} blocks wide</strong> and cover at least
+          <strong>{count(claims.minArea)} blocks</strong>.
+        </li>
         <li>Claiming is available in the Overworld, not the Nether or End.</li>
       </ul>
 

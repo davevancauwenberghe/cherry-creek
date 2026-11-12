@@ -1,4 +1,5 @@
 /** Player guide: checklist, claim planner, command finder and contents highlight. */
+import { planClaim, type ClaimLimits, type ClaimPlan } from '@/lib/claims.ts';
 
 // ---- First-day checklist ---------------------------------------------------
 const STORAGE_KEY = 'cherry-creek:first-day';
@@ -63,10 +64,14 @@ const planner = document.querySelector<HTMLElement>('[data-planner]');
 
 if (planner) {
   const number = (key: string) => Number(planner.dataset[key]);
-  const start = number('start');
-  const perHour = number('perHour');
-  const maxAccrued = number('maxAccrued');
-  const price = number('price');
+  const limits: ClaimLimits = {
+    startingBlocks: number('start'),
+    blocksPerHour: number('perHour'),
+    maxAccruedBlocks: number('maxAccrued'),
+    minWidth: number('minWidth'),
+    minArea: number('minArea'),
+    blockPrice: number('price'),
+  };
 
   const width = planner.querySelector<HTMLInputElement>('[data-planner-width]')!;
   const length = planner.querySelector<HTMLInputElement>('[data-planner-length]')!;
@@ -77,31 +82,39 @@ if (planner) {
   const verdict = planner.querySelector<HTMLElement>('[data-planner-verdict]')!;
 
   const format = (n: number) => n.toLocaleString('en-GB');
+  const hoursText = (n: number) => `${format(n)} more ${n === 1 ? 'hour' : 'hours'} of play`;
   const side = (input: HTMLInputElement) =>
-    Math.min(500, Math.max(1, Math.floor(Number(input.value)) || 1));
+    Math.min(500, Math.max(0, Math.floor(Number(input.value)) || 0));
+
+  const describe = (plan: ClaimPlan): string => {
+    if (!plan.ok) {
+      return plan.reason === 'too-narrow'
+        ? `Too narrow. A claim must be at least ${limits.minWidth} blocks wide on every side.`
+        : `Too small. A claim must cover at least ${format(limits.minArea)} blocks, for example 10 × 10.`;
+    }
+    if (plan.short === 0) return 'It fits exactly. Every block you have goes into this claim.';
+    if (plan.short < 0) return `It fits, with ${format(-plan.short)} blocks to spare.`;
+
+    const buyAll = `€${format(plan.costToBuy)} with /buyclaimblocks ${plan.short}`;
+    if (plan.hoursToEarn !== null) {
+      return `You're ${format(plan.short)} blocks short. That's about ${hoursText(plan.hoursToEarn)}, or ${buyAll}.`;
+    }
+    // Playing can never cover this: say so instead of quoting impossible hours.
+    const limit = `Playing earns at most ${format(limits.maxAccruedBlocks)} blocks`;
+    return plan.earnable === 0
+      ? `You're ${format(plan.short)} blocks short. ${limit} and you've reached that, so the rest has to be bought: ${buyAll}.`
+      : `You're ${format(plan.short)} blocks short. ${limit}, so even after earning the remaining ${format(plan.earnable)} you would have to buy ${format(plan.mustBuy)}. Buying the whole shortfall today costs ${buyAll}.`;
+  };
 
   const calculate = () => {
-    const area = side(width) * side(length);
-    const played = Number(hours.value);
-    const owned = start + Math.min(played * perHour, maxAccrued);
-    const short = area - owned;
-
-    hoursOut.textContent = String(played);
-    needs.textContent = format(area);
-    has.textContent = format(owned);
-
-    if (short <= 0) {
-      verdict.removeAttribute('data-short');
-      verdict.textContent =
-        short === 0
-          ? 'It fits exactly. Every block you have goes into this claim.'
-          : `It fits, with ${format(-short)} blocks to spare.`;
-    } else {
-      const moreHours = Math.ceil(short / perHour);
-      verdict.setAttribute('data-short', '');
-      verdict.textContent = `You're ${format(short)} blocks short. That's about ${format(moreHours)} more ${
-        moreHours === 1 ? 'hour' : 'hours'
-      } of play, or €${format(short * price)} with /buyclaimblocks ${short}.`;
+    const plan = planClaim(side(width), side(length), Number(hours.value), limits);
+    hoursOut.textContent = hours.value;
+    needs.textContent = plan.ok ? format(plan.area) : '–';
+    has.textContent = format(plan.owned);
+    verdict.textContent = describe(plan);
+    verdict.toggleAttribute('data-short', !plan.ok || plan.short > 0);
+    for (const input of [width, length]) {
+      input.setAttribute('aria-invalid', String(!plan.ok));
     }
   };
 

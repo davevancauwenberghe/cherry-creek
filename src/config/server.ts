@@ -16,6 +16,9 @@ export const server = {
     blocksPerHour: 50,
     maxAccruedBlocks: 20_000,
     maxClaims: 8,
+    /** GriefPrevention rejects claims narrower or smaller than this. */
+    minWidth: 5,
+    minArea: 100,
   },
   /** Items handed to first-time players, alongside the starting balance. */
   starterKit: ['1 wooden pickaxe', '1 wooden axe', '2 apples'],

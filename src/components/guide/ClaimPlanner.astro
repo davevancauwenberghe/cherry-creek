@@ -17,6 +17,8 @@ const { claims, economy } = server;
   data-per-hour={claims.blocksPerHour}
   data-max-accrued={claims.maxAccruedBlocks}
   data-price={economy.claimBlockPrice}
+  data-min-width={claims.minWidth}
+  data-min-area={claims.minArea}
   hidden
 >
   <h3 id="planner-heading" class="text-[1.3rem] font-bold text-snow">
@@ -38,7 +40,7 @@ const { claims, economy } = server;
           class="planner-number"
           type="number"
           inputmode="numeric"
-          min="1"
+          min={claims.minWidth}
           max="500"
           value="20"
           data-planner-width
@@ -54,7 +56,7 @@ const { claims, economy } = server;
           class="planner-number"
           type="number"
           inputmode="numeric"
-          min="1"
+          min={claims.minWidth}
           max="500"
           value="20"
           data-planner-length
@@ -102,10 +104,10 @@ const { claims, economy } = server;
   <p class="planner-verdict mt-4" role="status" data-planner-verdict></p>
   <p class="mt-3 text-sm text-silver">
     An estimate: it assumes none of your blocks are tied up in other claims. You start with{' '}
-    {count(claims.startingBlocks)}
-    blocks, earn {count(claims.blocksPerHour)} per eligible hour, and extra blocks cost{' '}
-    {euros(economy.claimBlockPrice)}
-    each.
+    {count(claims.startingBlocks)} blocks and earn {count(claims.blocksPerHour)} per eligible hour,
+    up to {count(claims.maxAccruedBlocks)}. Extra blocks cost {euros(economy.claimBlockPrice)} each.
+    A claim must be at least {claims.minWidth} blocks wide and cover at least{' '}
+    {count(claims.minArea)} blocks.
   </p>
 </section>
 
