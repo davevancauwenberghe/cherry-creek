@@ -30,17 +30,18 @@ cp .env.example .env    # optional: the defaults work
 npm run dev             # http://localhost:4321
 ```
 
-| Command            | What it does                                                 |
-| ------------------ | ------------------------------------------------------------ |
-| `npm run dev`      | Development server with hot reload                           |
-| `npm run build`    | Production build into `dist/`                                |
-| `npm run preview`  | Run the production build locally (reads `.env`)              |
-| `npm run lint`     | ESLint                                                       |
-| `npm run check`    | Type-check Astro and TypeScript files                        |
-| `npm test`         | Unit tests for the status protocol, config and cache         |
-| `npm run format`   | Format with Prettier                                         |
-| `npm run validate` | Lint, type-check, test and build in one go                   |
-| `npm run art`      | Regenerate the placeholder artwork, favicon and social image |
+| Command              | What it does                                                        |
+| -------------------- | ------------------------------------------------------------------- |
+| `npm run dev`        | Development server with hot reload                                  |
+| `npm run build`      | Production build into `dist/`                                       |
+| `npm run preview`    | Run the production build locally (reads `.env`)                     |
+| `npm run lint`       | ESLint                                                              |
+| `npm run check`      | Type-check Astro and TypeScript files                               |
+| `npm test`           | Unit tests for the status protocol, config and cache                |
+| `npm run format`     | Format with Prettier                                                |
+| `npm run check:html` | After a build, fail if a word has been glued to a link or bold text |
+| `npm run validate`   | Lint, type-check, test, build and check the built HTML in one go    |
+| `npm run art`        | Regenerate the placeholder artwork, favicon and social image        |
 
 ## Project layout
 
@@ -49,9 +50,10 @@ src/
   config/site.ts        Names, addresses and links (single source of truth)
   config/server.ts      Gameplay figures shared by the home page and guide
   config/rules.ts       Community rules and reminders
+  config/mods.ts        Optional client-side mods, shaders and resource packs for /mods
   components/           One component per page section, plus shared pieces
   layouts/              Base (head, nav, footer) and Page (text pages)
-  pages/                index, guide, rules, privacy, 404, api/status, healthz
+  pages/                index, guide, mods, rules, privacy, 404, api/status, healthz
   lib/minecraft/ping.ts Minecraft status protocol client (no dependencies)
   lib/status/           Environment config and cached status service
   scripts/              Small browser scripts
@@ -69,6 +71,7 @@ tests/                  Node test runner tests
 - **Server figures:** starting balance, claim block price, claim limits and the starter kit live in `src/config/server.ts`. The home page and the player guide both read from it.
 - **Rules:** `src/config/rules.ts` holds the rules and the reminders shown beneath them. If the `rules` list is ever emptied, the page falls back to a pointer to Discord and drops out of the footer, the sitemap and search engines.
 - **Screenshots:** the hero and map card use original illustrations so that nothing is passed off as real gameplay. Add `hero.jpg` and/or `map.jpg` to `src/assets/screenshots/` and they replace the illustrations automatically. See the README in that folder.
+- **Recommended mods:** the list on `/mods` lives in `src/config/mods.ts`. Keep it alphabetical; the page shows it in file order.
 - **New pages:** add a file to `src/pages/` using the `Page` layout. It is added to the sitemap automatically.
 
 ## Configuration

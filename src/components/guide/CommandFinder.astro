@@ -4,7 +4,7 @@
  * src/scripts/guide.ts adds filtering, and the shared copy handler makes each
  * command copyable.
  */
-const categories = ['Homes', 'Teleport', 'Money', 'Claims'] as const;
+const categories = ['Homes', 'Teleport', 'Money', 'Claims', 'General'] as const;
 
 const commands: { command: string; does: string; category: (typeof categories)[number] }[] = [
   { command: '/sethome', does: 'Save your current location as a home.', category: 'Homes' },
@@ -53,6 +53,12 @@ const commands: { command: string; does: string; category: (typeof categories)[n
   },
   { command: '/trustlist', does: 'Display trusted players for your claim.', category: 'Claims' },
   { command: '/abandonclaim', does: "Delete the claim you're standing in.", category: 'Claims' },
+  {
+    command: '/mobignore',
+    does: 'Temporarily stop hostile mobs from targeting you.',
+    category: 'General',
+  },
+  { command: '/about', does: 'Show more information about Cherry Creek.', category: 'General' },
 ];
 
 /** What lands on the clipboard: the command up to its first placeholder. */
