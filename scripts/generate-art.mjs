@@ -322,6 +322,307 @@ ${claim(14, 12, 13, 10)}${claim(62, 30, 16, 12)}${claim(24, 38, 9, 9)}
 }
 
 // ---------------------------------------------------------------------------
+// Camp scene: the campfire clearing in the grove, redrawn from an in-game
+// screenshot of Cherry Creek in the same blocky style as the hero.
+// ---------------------------------------------------------------------------
+function campScene() {
+  const W = 1920;
+  const H = 1080;
+  const U = 12;
+  const cols = W / U;
+  const rows = H / U;
+  const rand = rng(20261116);
+  const pick = (list) => list[Math.floor(rand() * list.length)];
+
+  /** A leafy mass: a union of noisy ellipses, lit from above, darker underneath. */
+  function canopy(layer, blobs, palette, leafChance = 0.035) {
+    for (const [cx, cy, rx, ry] of blobs) {
+      for (let y = Math.floor(cy - ry); y <= Math.ceil(cy + ry); y++) {
+        for (let x = Math.floor(cx - rx); x <= Math.ceil(cx + rx); x++) {
+          const e = ((x - cx) / rx) ** 2 + ((y - cy) / ry) ** 2;
+          if (e > 1 + (rand() - 0.5) * 0.22) continue;
+          const depth = (y - cy) / ry + (rand() - 0.5) * 0.7;
+          let colour = palette.mid;
+          if (depth < -0.35) colour = palette.light;
+          else if (depth > 0.45) colour = palette.dark;
+          if (rand() < leafChance) colour = palette.leaf;
+          else if (rand() < 0.08) colour = palette.bright;
+          layer.set(x, y, colour);
+        }
+      }
+    }
+  }
+
+  function block(layer, x0, y0, w, h, colours) {
+    for (let y = y0; y < y0 + h; y++) {
+      for (let x = x0; x < x0 + w; x++)
+        layer.set(x, y, typeof colours === 'string' ? colours : pick(colours));
+    }
+  }
+
+  const far = {
+    light: '#E9B3C4',
+    mid: '#C98CA6',
+    dark: '#9A6684',
+    bright: '#F3C9D3',
+    leaf: '#9FA98C',
+  };
+  const near = {
+    light: '#FFC9D3',
+    mid: '#E88DA5',
+    dark: '#A8587A',
+    bright: '#FFE1E7',
+    leaf: '#7FB07A',
+  };
+  const front = {
+    light: '#F7B4C4',
+    mid: '#D9789A',
+    dark: '#8C4266',
+    bright: '#FFD3DC',
+    leaf: '#6FA068',
+  };
+  const BARK = ['#1C1418', '#221920', '#17110F'];
+
+  // --- Sky ------------------------------------------------------------------
+  const clouds = new CellLayer(U);
+  for (const [cx, cy, w] of [
+    [70, 9, 18],
+    [92, 5, 12],
+    [58, 20, 14],
+    [86, 24, 20],
+    [104, 15, 10],
+    [76, 33, 16],
+  ]) {
+    for (let x = 0; x < w; x++) clouds.set(cx + x, cy, '#F6D9D2');
+    for (let x = 2; x < w - 2; x++) clouds.set(cx + x, cy - 1, '#FBEAE2');
+    for (let x = 4; x < w - 5; x++) clouds.set(cx + x, cy - 2, '#FBEAE2');
+  }
+
+  // --- Distant grove --------------------------------------------------------
+  const distant = new CellLayer(U);
+  for (let x = 2; x < cols; x += 9 + Math.floor(rand() * 5)) {
+    block(distant, x, 44, 2, 9, '#2A1F27');
+  }
+  canopy(
+    distant,
+    Array.from({ length: 16 }, (_, i) => [
+      i * 11 + rand() * 4,
+      41 + rand() * 3,
+      8 + rand() * 3,
+      5 + rand() * 2,
+    ]),
+    far,
+  );
+
+  // --- Ground ---------------------------------------------------------------
+  const HORIZON = 52;
+  const ground = new CellLayer(U);
+  for (let y = HORIZON; y < rows; y++) {
+    for (let x = 0; x < cols; x++) {
+      // Leaf litter: mottled browns with warm flecks, darker in the tree shade.
+      const shade = y < 60 || x < 26 || x > 132;
+      const r = rand();
+      let colour = shade
+        ? pick(['#3B2418', '#462A1A', '#33201A'])
+        : pick(['#5A351E', '#6B4020', '#4C2D1B']);
+      if (!shade && r < 0.16) colour = '#9A5A22';
+      else if (!shade && r < 0.2) colour = '#C27B2B';
+      ground.set(x, y, colour);
+    }
+  }
+  // Grass: the meadow on the left, and the sunlit patch in the near right corner.
+  for (let y = HORIZON; y < rows; y++) {
+    for (let x = 0; x < cols; x++) {
+      const left = x < 30 - (y - HORIZON) * 1.1 + Math.sin(y * 0.9) * 1.5 && y < 74;
+      const corner = y > 70 && x > 104 + (rows - y) * 2.2 + Math.sin(y * 0.7) * 2;
+      if (left) ground.set(x, y, pick(['#3F6B3C', '#4C7A45', '#35603A']));
+      if (corner) ground.set(x, y, pick(['#7DB56A', '#8ED5A3', '#6FA95E']));
+    }
+  }
+  // Low stone wall along the back of the clearing.
+  block(ground, 0, HORIZON - 1, cols, 2, ['#2C3338', '#353D42', '#262C31']);
+
+  const sand = new Set();
+  // Sand path: wide at the near left, narrowing to the campfire.
+  for (let y = 56; y < rows; y++) {
+    const t = (y - 56) / (rows - 56);
+    const centre = 80 - t * 58;
+    const half = 7 + t * 26;
+    for (let x = Math.round(centre - half); x <= Math.round(centre + half); x++) {
+      if (x < 0 || x >= cols) continue;
+      sand.add(`${x},${y}`);
+      ground.set(x, y, pick(['#C9A45C', '#B8934F', '#D6B36A', '#C09A55']));
+    }
+  }
+  block(ground, 62, 54, 32, 4, ['#D6B36A', '#C9A45C', '#E0BF78']);
+
+  // --- Huts -----------------------------------------------------------------
+  const huts = new CellLayer(U);
+  function hut(x, y, w, h, pillars) {
+    block(huts, x, y + 2, w, h - 2, ['#4A2C1C', '#3F2619', '#55331F']);
+    block(huts, x + 3, y + 4, w - 6, h - 4, '#1A1210'); // open front
+    block(huts, x - 2, y, w + 4, 2, ['#3A2217', '#2F1C14']); // roof slab
+    block(huts, x - 2, y, w + 4, 1, '#6B4020');
+    for (const px of pillars) {
+      for (let py = y + 4; py < y + h; py++) {
+        huts.set(px, py, '#D9D4C7');
+        if ((py - y) % 2 === 0) huts.set(px + 1, py, '#BDB8AC'); // notched like bone
+      }
+    }
+  }
+  hut(35, 42, 24, 13, [46, 57]);
+  hut(83, 44, 14, 10, [95]);
+  hut(120, 39, 30, 19, [123, 131]);
+
+  // --- Benches, lamps and the fire -----------------------------------------
+  const props = new CellLayer(U);
+  function bench(x, y, w) {
+    block(props, x, y, w, 1, ['#B9B4AE', '#A8A39D']);
+    block(props, x, y + 1, w, 2, ['#F2B9C4', '#E9A6B5', '#F7C6CF']);
+  }
+  bench(64, 52, 10);
+  bench(84, 51, 8);
+  bench(92, 53, 7);
+
+  function lamp(x, top, bottom, big) {
+    for (let y = top; y < bottom; y++) {
+      props.set(x, y, (y - top) % 2 ? '#F2B9C4' : '#FBE3E8'); // striped cherry-wood pole
+      if (big) props.set(x + 1, y, (y - top) % 2 ? '#E9A6B5' : '#F2CDD5');
+    }
+    const w = big ? 6 : 4;
+    const h = big ? 5 : 3;
+    const hx = x - Math.floor(w / 2) + (big ? 1 : 0);
+    block(props, hx, top - h, w, h, ['#E3B455', '#D9A645', '#EEC56A']);
+    for (const side of [hx - 1, hx + w]) {
+      props.set(side, top - 2, '#6B4020');
+      props.set(side, top - 3, '#F5C96A');
+      props.set(side, top - 4, '#FFE2A6');
+    }
+    props.set(hx + Math.floor(w / 2), top - h - 1, '#FFE2A6');
+  }
+  lamp(73, 43, 53, false);
+  lamp(99, 36, 61, true);
+
+  // Campfire with a column of smoke drifting up through the trees.
+  block(props, 78, 56, 7, 2, ['#6B4020', '#8A5A2B', '#4A2C1C']);
+  const flame = ['..o..', '.oyo.', 'oywyo', 'oywyo'];
+  flame.forEach((line, dy) => {
+    [...line].forEach((ch, dx) => {
+      if (ch === '.') return;
+      props.set(79 + dx, 52 + dy, { o: '#E88A3A', y: '#F5C96A', w: '#FFF1CF' }[ch]);
+    });
+  });
+  let sx = 81;
+  for (let y = 49, step = 0; y > 24; y -= 4, step++) {
+    sx += step % 2 ? 2 : -1;
+    const size = 2 + Math.floor(step / 2);
+    for (let dy = 0; dy < size; dy++) {
+      for (let dx = 0; dx < size + 1; dx++) {
+        // Knock the corners off so each puff reads as a cloud, not a box.
+        const corner = (dx === 0 || dx === size) && (dy === 0 || dy === size - 1);
+        if (corner && size > 2) continue;
+        props.set(sx + dx, y - dy, pick(['#E6DCD7', '#D4C9C6', '#F1E9E4']));
+      }
+    }
+  }
+
+  // --- Trees in front -------------------------------------------------------
+  const trunks = new CellLayer(U);
+  block(trunks, 5, 22, 15, 33, BARK);
+  block(trunks, 28, 40, 4, 14, BARK);
+  block(trunks, 111, 40, 5, 17, BARK);
+  block(trunks, 149, 22, 11, 56, ['#2A1A22', '#33202A', '#241620']);
+
+  const mid = new CellLayer(U);
+  canopy(
+    mid,
+    [
+      [92, 26, 16, 10],
+      [84, 32, 9, 6],
+      [104, 31, 8, 6],
+    ],
+    near,
+  );
+
+  const leaves = new CellLayer(U);
+  canopy(
+    leaves,
+    [
+      [14, 6, 30, 16],
+      [44, 12, 22, 14],
+      [8, 26, 16, 10],
+      [58, 24, 13, 9],
+      [34, 30, 14, 7],
+      [70, 8, 10, 6],
+    ],
+    front,
+  );
+  canopy(
+    leaves,
+    [
+      [146, 8, 26, 18],
+      [120, 14, 18, 12],
+      [152, 30, 14, 9],
+      [128, 32, 12, 6],
+      [108, 6, 9, 6],
+    ],
+    front,
+  );
+
+  // --- Flowers and drifting petals -----------------------------------------
+  const flowers = new CellLayer(U);
+  for (let i = 0; i < 46; i++) {
+    const y = 60 + Math.floor(rand() ** 0.8 * (rows - 62));
+    const x = Math.floor(rand() * cols);
+    if (sand.has(`${x},${y}`)) continue;
+    flowers.set(x, y, '#5E8F4E');
+    flowers.set(x, y - 1, pick(['#FFB7C5', '#FFE1E7', '#E88DA5']));
+    if (y > 76) {
+      flowers.set(x + 1, y - 1, '#FFB7C5');
+      flowers.set(x - 1, y - 1, '#FFE1E7');
+      flowers.set(x, y - 2, '#FFB7C5');
+    }
+  }
+  const petals = new CellLayer(6);
+  for (let i = 0; i < 40; i++) {
+    petals.set(
+      Math.floor(rand() * (W / 6)),
+      60 + Math.floor(rand() * 100),
+      pick(['#FFB7C5', '#FFD3DC']),
+    );
+  }
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" shape-rendering="crispEdges">
+<defs>
+<linearGradient id="csky" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#16242C"/><stop offset=".22" stop-color="#3B4257"/>
+<stop offset=".38" stop-color="#8E6379"/><stop offset=".5" stop-color="#E69A86"/><stop offset=".58" stop-color="#F5C96A"/>
+</linearGradient>
+<radialGradient id="cfire" cx="${81.5 * U}" cy="${55 * U}" r="430" gradientUnits="userSpaceOnUse">
+<stop offset="0" stop-color="#FFD98A" stop-opacity=".7"/><stop offset=".4" stop-color="#F5A85A" stop-opacity=".25"/>
+<stop offset="1" stop-color="#F5A85A" stop-opacity="0"/>
+</radialGradient>
+<linearGradient id="cshade" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#0D1518" stop-opacity=".45"/><stop offset=".45" stop-color="#0D1518" stop-opacity="0"/>
+</linearGradient>
+</defs>
+<rect width="${W}" height="${H}" fill="url(#csky)"/>
+<g opacity=".5">${clouds.svg()}</g>
+${distant.svg()}
+${ground.svg()}
+${huts.svg()}
+${mid.svg()}
+${trunks.svg()}
+${props.svg()}
+${flowers.svg()}
+<rect width="${W}" height="${H}" fill="url(#cfire)"/>
+${leaves.svg()}
+<rect width="${W}" height="${H}" fill="url(#cshade)"/>
+<g opacity=".8">${petals.svg()}</g>
+</svg>`;
+}
+
+// ---------------------------------------------------------------------------
 // Brand mark: a five-petal pixel blossom.
 // ---------------------------------------------------------------------------
 const BLOSSOM = [
@@ -380,6 +681,11 @@ await mkdir(out('public'), { recursive: true });
 const scene = heroScene();
 await writeFile(out('src/assets/art/hero-scene.svg'), scene);
 await writeFile(out('src/assets/art/map-preview.svg'), mapPreview());
+// The camp scene has too much per-block texture to be a small SVG, so it
+// ships as a raster; Astro resizes and converts it at build time.
+await sharp(Buffer.from(campScene()))
+  .png({ compressionLevel: 9, palette: true, colours: 128 })
+  .toFile(out('src/assets/art/camp-scene.png'));
 await writeFile(out('src/assets/art/mark.svg'), markSvg);
 await writeFile(out('public/favicon.svg'), faviconSvg);
 await sharp(Buffer.from(faviconSvg), { density: 300 })

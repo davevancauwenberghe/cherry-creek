@@ -1,0 +1,226 @@
+---
+import Icon from '@/components/Icon.astro';
+import { modKinds, mods, type ModKind } from '@/config/mods';
+import Base from '@/layouts/Base.astro';
+
+const plural: Record<ModKind, string> = {
+  Mod: 'Mods',
+  Shader: 'Shaders',
+  'Resource pack': 'Resource packs',
+  Library: 'Libraries',
+};
+---
+
+<Base
+  title="Recommended mods, shaders and resource packs"
+  description="The best way to experience Cherry Creek: optional client-side Minecraft mods, shaders and resource packs for performance, maps, lighting and sound."
+>
+  <div class="page-top">
+    <div class="shell pt-36 pb-10 sm:pt-44">
+      <h1 class="max-w-4xl text-[clamp(2.4rem,5.6vw,4rem)] font-extrabold">
+        The best way to experience Cherry Creek
+      </h1>
+      <p class="lede mt-5">
+        Cherry Creek plays perfectly well with an unmodified game. If you want smoother performance,
+        a map in the corner, softer light through the cherry trees and a few small comforts, this is
+        the setup the server's admin plays with. Take all of it or only the parts you like.
+      </p>
+    </div>
+  </div>
+
+  <div class="shell pb-24">
+    <ul class="basics grid gap-4 md:grid-cols-3">
+      <li>
+        <h2>Everything here is optional</h2>
+        <p>
+          These run on your own computer. Nothing changes on the server, and nobody is left out for
+          playing without them.
+        </p>
+      </li>
+      <li>
+        <h2>Mods need a mod loader</h2>
+        <p>
+          Mods and shaders need a modded game, for example through the Modrinth app. Resource packs
+          work in any game.
+        </p>
+      </li>
+      <li>
+        <h2>Match your game version</h2>
+        <p>
+          Before downloading, check on each page that it supports your Minecraft version and mod
+          loader.
+        </p>
+      </li>
+    </ul>
+
+    <div class="mt-12" data-mods>
+      <div
+        class="flex flex-wrap gap-2"
+        role="group"
+        aria-label="Filter by type"
+        data-mods-controls
+        hidden
+      >
+        <button type="button" class="chip" aria-pressed="true" data-mods-kind="">
+          All
+        </button>
+        {modKinds.map((kind) => (
+          <button type="button" class="chip" aria-pressed="false" data-mods-kind={kind}>
+            {plural[kind]}
+          </button>
+        ))}
+      </div>
+      <p class="mt-3 text-sm text-silver" role="status" data-mods-count>
+        {mods.length} extras, in alphabetical order.
+      </p>
+
+      <ul class="mt-6 grid gap-4 md:grid-cols-2">
+        {mods.map((mod) => (
+          <li class="mod-card" data-mods-item data-kind={mod.kind}>
+            <p class="mod-kind" data-kind={mod.kind}>
+              {mod.kind}
+            </p>
+            <h2 class="mt-2 text-[1.3rem] font-bold">{mod.name}</h2>
+            <p class="mt-1.5 text-silver">{mod.does}</p>
+            {mod.note && <p class="mt-2 text-[0.95rem] text-sand">{mod.note}</p>}
+            <a
+              class="link mt-4 inline-flex items-center gap-1.5 text-[0.95rem]"
+              href={mod.url}
+              target="_blank"
+              rel="noopener"
+            >
+              <span>View {mod.name} on Modrinth</span>
+              <Icon name="external" size={14} class="opacity-70" />
+              <span class="sr-only">(opens in a new tab)</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+
+    <p class="mt-12 max-w-3xl text-sm text-silver">
+      These are independent projects by their own authors, hosted on Modrinth. Cherry Creek is not
+      affiliated with them and does not distribute them. Only download mods from sources you trust.
+    </p>
+  </div>
+
+  <script>
+    // Type filter. Without JavaScript the full list simply stays visible.
+    const root = document.querySelector<HTMLElement>('[data-mods]');
+    if (root) {
+      const controls = root.querySelector<HTMLElement>('[data-mods-controls]');
+      const chips = [...root.querySelectorAll<HTMLButtonElement>('[data-mods-kind]')];
+      const items = [...root.querySelectorAll<HTMLElement>('[data-mods-item]')];
+      const count = root.querySelector('[data-mods-count]');
+
+      for (const chip of chips) {
+        chip.addEventListener('click', () => {
+          const kind = chip.dataset.modsKind ?? '';
+          let shown = 0;
+          for (const item of items) {
+            item.hidden = kind !== '' && item.dataset.kind !== kind;
+            if (!item.hidden) shown++;
+          }
+          for (const other of chips) other.setAttribute('aria-pressed', String(other === chip));
+          if (count) {
+            count.textContent =
+              kind === ''
+                ? `${shown} extras, in alphabetical order.`
+                : `${shown} of ${items.length} shown: ${chip.textContent?.trim().toLowerCase()}.`;
+          }
+        });
+      }
+      if (controls) controls.hidden = false;
+    }
+  </script>
+</Base>
+
+<style>
+  .page-top {
+    background:
+      radial-gradient(40rem 20rem at 85% 0%, rgb(232 141 165 / 0.16), transparent 70%),
+      radial-gradient(34rem 18rem at 20% 0%, rgb(142 213 163 / 0.1), transparent 70%);
+  }
+
+  .basics li {
+    padding: 1.25rem 1.4rem;
+    border-radius: 1.25rem;
+    border: 1px solid var(--line);
+    background: rgb(244 245 244 / 0.03);
+  }
+  .basics h2 {
+    font-family: var(--font-sans);
+    font-size: 1.05rem;
+    font-weight: 600;
+    letter-spacing: 0;
+    line-height: 1.3;
+  }
+  .basics p {
+    margin-top: 0.4rem;
+    color: var(--color-silver);
+    font-size: 0.975rem;
+  }
+
+  .chip {
+    min-height: 2.25rem;
+    padding: 0.3rem 0.9rem;
+    border-radius: 999px;
+    border: 1px solid var(--line-strong);
+    color: var(--color-snow);
+    font-size: 0.925rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition:
+      background-color 0.2s,
+      border-color 0.2s;
+  }
+  .chip:hover {
+    background: rgb(244 245 244 / 0.08);
+  }
+  .chip[aria-pressed='true'] {
+    background: var(--color-sand);
+    border-color: var(--color-sand);
+    color: #2a2418;
+  }
+
+  .mod-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1.4rem 1.5rem;
+    border-radius: 1.5rem;
+    border: 1px solid var(--line);
+    background: rgb(23 33 38 / 0.7);
+    transition: border-color 0.3s;
+  }
+  .mod-card:hover {
+    border-color: var(--line-strong);
+  }
+  .mod-card[hidden] {
+    display: none;
+  }
+  .mod-card a {
+    margin-top: auto;
+    padding-top: 1rem;
+  }
+  .mod-kind {
+    padding: 0.15rem 0.65rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-meadow);
+    background: rgb(142 213 163 / 0.12);
+  }
+  .mod-kind[data-kind='Shader'] {
+    color: var(--color-gold);
+    background: rgb(245 201 106 / 0.12);
+  }
+  .mod-kind[data-kind='Resource pack'] {
+    color: var(--color-blossom);
+    background: rgb(255 183 197 / 0.12);
+  }
+  .mod-kind[data-kind='Library'] {
+    color: var(--color-silver);
+    background: rgb(169 181 181 / 0.14);
+  }
+</style>

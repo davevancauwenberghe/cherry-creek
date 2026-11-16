@@ -1,6 +1,10 @@
 ---
 /** Economy and land protection. Figures come from src/config/server.ts. */
 import { count, euros, server } from '@/config/server';
+import Icon from './Icon.astro';
+
+const backupNote =
+  'The server has a daily off-site backup, so there is always a recent copy of the world stored somewhere else.';
 
 const economy = [
   { value: euros(server.economy.startingBalance), label: 'Starting balance for every new player' },
@@ -66,7 +70,7 @@ const land = [
         </h3>
         <p class="mt-3 text-silver">
           Claim the land you build on and nobody else can break or take what's inside. Mark out a
-          claim with a<strong class="font-semibold text-snow">golden shovel</strong>, and hold a
+          claim with a <strong class="font-semibold text-snow">golden shovel</strong>, and hold a
           <strong class="font-semibold text-snow">stick</strong> to see who owns the land you're
           standing on.
         </p>
@@ -88,6 +92,20 @@ const land = [
         </p>
       </article>
     </div>
+
+    <aside
+      class="backup mt-14 flex items-start gap-4 rounded-3xl border border-(--line) p-5 sm:p-6"
+      aria-labelledby="backup-heading"
+      data-reveal
+    >
+      <Icon name="shield" size={26} class="mt-0.5 shrink-0 text-meadow" />
+      <div>
+        <h3 id="backup-heading" class="font-sans text-[1.1rem] font-semibold tracking-normal">
+          Backed up every day
+        </h3>
+        <p class="mt-1 text-silver">{backupNote}</p>
+      </div>
+    </aside>
   </div>
 </section>
 

@@ -30,17 +30,18 @@ cp .env.example .env    # optional: the defaults work
 npm run dev             # http://localhost:4321
 ```
 
-| Command            | What it does                                                 |
-| ------------------ | ------------------------------------------------------------ |
-| `npm run dev`      | Development server with hot reload                           |
-| `npm run build`    | Production build into `dist/`                                |
-| `npm run preview`  | Run the production build locally (reads `.env`)              |
-| `npm run lint`     | ESLint                                                       |
-| `npm run check`    | Type-check Astro and TypeScript files                        |
-| `npm test`         | Unit tests for the status protocol, config and cache         |
-| `npm run format`   | Format with Prettier                                         |
-| `npm run validate` | Lint, type-check, test and build in one go                   |
-| `npm run art`      | Regenerate the placeholder artwork, favicon and social image |
+| Command              | What it does                                                        |
+| -------------------- | ------------------------------------------------------------------- |
+| `npm run dev`        | Development server with hot reload                                  |
+| `npm run build`      | Production build into `dist/`                                       |
+| `npm run preview`    | Run the production build locally (reads `.env`)                     |
+| `npm run lint`       | ESLint                                                              |
+| `npm run check`      | Type-check Astro and TypeScript files                               |
+| `npm test`           | Unit tests for the status protocol, config and cache                |
+| `npm run format`     | Format with Prettier                                                |
+| `npm run check:html` | After a build, fail if a word has been glued to a link or bold text |
+| `npm run validate`   | Lint, type-check, test, build and check the built HTML in one go    |
+| `npm run art`        | Regenerate the placeholder artwork, favicon and social image        |
 
 ## Project layout
 
@@ -49,13 +50,15 @@ src/
   config/site.ts        Names, addresses and links (single source of truth)
   config/server.ts      Gameplay figures shared by the home page and guide
   config/rules.ts       Community rules and reminders
+  config/mods.ts        Optional client-side mods, shaders and resource packs for /mods
   components/           One component per page section, plus shared pieces
   layouts/              Base (head, nav, footer) and Page (text pages)
-  pages/                index, guide, rules, privacy, 404, api/status, healthz
+  pages/                index, guide, mods, rules, privacy, 404, robots.txt, llms.txt,
+                        api/status, healthz
   lib/minecraft/ping.ts Minecraft status protocol client (no dependencies)
   lib/status/           Environment config and cached status service
   scripts/              Small browser scripts
-  assets/art/           Generated placeholder artwork
+  assets/art/           Generated artwork (hero, map preview, camp scene, brand mark)
   assets/screenshots/   Drop real screenshots here
 scripts/generate-art.mjs  Draws the placeholder artwork
 deploy/                 Example Apache virtual host
@@ -69,7 +72,18 @@ tests/                  Node test runner tests
 - **Server figures:** starting balance, claim block price, claim limits and the starter kit live in `src/config/server.ts`. The home page and the player guide both read from it.
 - **Rules:** `src/config/rules.ts` holds the rules and the reminders shown beneath them. If the `rules` list is ever emptied, the page falls back to a pointer to Discord and drops out of the footer, the sitemap and search engines.
 - **Screenshots:** the hero and map card use original illustrations so that nothing is passed off as real gameplay. Add `hero.jpg` and/or `map.jpg` to `src/assets/screenshots/` and they replace the illustrations automatically. See the README in that folder.
+- **Recommended mods:** the list on `/mods` lives in `src/config/mods.ts`. Keep it alphabetical; the page shows it in file order.
 - **New pages:** add a file to `src/pages/` using the `Page` layout. It is added to the sitemap automatically.
+
+## Search and discovery
+
+- **Titles and descriptions** are set per page through the `Base` layout; the default description is `site.description` in `src/config/site.ts`.
+- **Structured data:** every indexable page carries a small JSON-LD block (`WebSite` and `Organization`) built in `src/layouts/Base.astro`.
+- **`/sitemap-index.xml`** is generated at build time and lists every indexable page.
+- **`/robots.txt`** allows all crawlers, keeps them out of `/api/` and `/healthz`, and points to the sitemap.
+- **`/llms.txt`** is a plain-text summary for AI assistants, generated from the same config files as the pages (`src/pages/llms.txt.ts`), so it stays in step with them.
+
+Outside the code: add the site to Google Search Console and Bing Webmaster Tools and submit the sitemap, and check that Cloudflare is not set to block AI crawlers if you want assistants to be able to read the site.
 
 ## Configuration
 
