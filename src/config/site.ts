@@ -24,7 +24,7 @@ export const site = {
   name: 'Cherry Creek',
   tagline: 'Your next adventure begins here.',
   description:
-    'Cherry Creek is a small, whitelisted Minecraft Java survival community for building, exploring and trading together.',
+    'Cherry Creek is a small, friendly, whitelisted Minecraft Java Edition SMP: a survival server with land claims, an in-game economy, a live 3D map and a Discord community.',
   serverAddress: hostname(env.PUBLIC_SERVER_ADDRESS, 'play.cherrycreek.app'),
   mapUrl: httpsUrl(env.PUBLIC_MAP_URL, 'https://map.cherrycreek.app'),
   discordUrl: httpsUrl(env.PUBLIC_DISCORD_URL, 'https://discord.gg/dRxSt8Bt9t'),

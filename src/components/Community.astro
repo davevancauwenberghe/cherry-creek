@@ -1,4 +1,6 @@
 ---
+import { Image } from 'astro:assets';
+import campScene from '@/assets/art/camp-scene.png';
 import { site } from '@/config/site';
 import Icon from './Icon.astro';
 
@@ -19,48 +21,53 @@ const discord = [
 ];
 ---
 
-<section
-  id="community"
-  class="section relative isolate overflow-hidden"
-  aria-labelledby="community-heading"
->
-  <div class="glow absolute inset-0 -z-10" aria-hidden="true"></div>
-  <div class="shell grid gap-12 lg:grid-cols-2 lg:gap-20">
-    <div>
-      <h2 id="community-heading" class="section-title">
-        A place for builders, explorers and easy-going survivalists
-      </h2>
-      <p class="lede mt-5">
-        Cherry Creek is small on purpose. Come as you are, play at your own pace, and get to know
-        the people you share a world with.
-      </p>
-      <a href={site.discordUrl} class="btn btn-quiet mt-8" target="_blank" rel="noopener">
-        Join the Discord
-        <Icon name="external" size={16} />
-        <span class="sr-only">(opens in a new tab)</span>
-      </a>
-    </div>
+<section id="community" class="section" aria-labelledby="community-heading">
+  <div class="shell">
+    <figure data-reveal>
+      <Image
+        src={campScene}
+        alt="Pixel-art illustration of the campfire clearing on Cherry Creek: benches around a fire, lamp posts and small huts under cherry trees"
+        widths={[640, 1024, 1600, 1920]}
+        sizes="(min-width: 80rem) 72rem, 100vw"
+        quality={90}
+        loading="lazy"
+        class="aspect-[16/10] w-full rounded-4xl border border-(--line) object-cover object-[50%_60%] sm:aspect-[2/1] lg:aspect-[21/9]"
+      />
+      <figcaption class="mt-3 text-sm text-silver lg:max-w-[calc(100%-28rem)]">
+        The campfire clearing on Cherry Creek, redrawn from an in-game screenshot.
+      </figcaption>
+    </figure>
 
-    <div class="glass rounded-3xl p-6 sm:p-8" data-reveal>
-      <h3 class="font-sans text-sm font-medium tracking-normal text-silver">
-        On Discord, through DiscordSRV
-      </h3>
-      <ul class="mt-2 divide-y divide-(--line)">
-        {discord.map((item) => (
-          <li class="py-4 last:pb-0">
-            <p class="font-semibold text-snow">{item.title}</p>
-            <p class="mt-0.5 text-silver">{item.body}</p>
-          </li>
-        ))}
-      </ul>
+    <div class="mt-10 grid gap-10 lg:mt-4 lg:grid-cols-[minmax(0,1fr)_25rem] lg:gap-14">
+      <div class="lg:pt-10">
+        <h2 id="community-heading" class="section-title">
+          A place for builders, explorers and easy-going survivalists
+        </h2>
+        <p class="lede mt-5">
+          Cherry Creek is small on purpose. Come as you are, play at your own pace, and get to know
+          the people you share a world with.
+        </p>
+        <a href={site.discordUrl} class="btn btn-quiet mt-8" target="_blank" rel="noopener">
+          Join the Discord
+          <Icon name="external" size={16} />
+          <span class="sr-only">(opens in a new tab)</span>
+        </a>
+      </div>
+
+      <!-- On wide screens the card rises over the corner of the scene, so the glass has something to catch. -->
+      <div class="glass relative rounded-3xl p-6 sm:p-7 lg:-mt-44 lg:mr-8" data-reveal>
+        <h3 class="font-sans text-sm font-medium tracking-normal text-silver">
+          On Discord, through DiscordSRV
+        </h3>
+        <ul class="mt-2 divide-y divide-(--line)">
+          {discord.map((item) => (
+            <li class="py-3.5 last:pb-0">
+              <p class="font-semibold text-snow">{item.title}</p>
+              <p class="mt-0.5 text-[0.95rem] text-snow/75">{item.body}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   </div>
 </section>
-
-<style>
-  .glow {
-    background:
-      radial-gradient(36rem 26rem at 85% 55%, rgb(232 141 165 / 0.14), transparent 70%),
-      radial-gradient(30rem 22rem at 62% 20%, rgb(142 213 163 / 0.1), transparent 70%);
-  }
-</style>
