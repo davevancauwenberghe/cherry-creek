@@ -76,6 +76,9 @@ if (planner) {
   const width = planner.querySelector<HTMLInputElement>('[data-planner-width]')!;
   const length = planner.querySelector<HTMLInputElement>('[data-planner-length]')!;
   const hours = planner.querySelector<HTMLInputElement>('[data-planner-hours]')!;
+  const availableInput = planner.querySelector<HTMLInputElement>('[data-planner-available]');
+  const hasLabel = planner.querySelector('[data-planner-has-label]');
+  const starterArea = number('starterArea');
   const hoursOut = planner.querySelector('[data-planner-hours-out]')!;
   const needs = planner.querySelector('[data-planner-needs]')!;
   const has = planner.querySelector('[data-planner-has]')!;
@@ -111,7 +114,22 @@ if (planner) {
   };
 
   const calculate = () => {
-    const plan = planClaim(side(width), side(length), Number(hours.value), limits);
+    // A /claimslist figure, when given, replaces the estimate.
+    const raw = availableInput?.value.trim() ?? '';
+    const entered = raw === '' ? NaN : Number(raw);
+    const available = Number.isFinite(entered) ? Math.max(Math.floor(entered), 0) : undefined;
+    const plan = planClaim(
+      side(width),
+      side(length),
+      Number(hours.value),
+      limits,
+      starterArea,
+      available,
+    );
+    if (hasLabel) {
+      hasLabel.textContent =
+        available === undefined ? 'You have (estimated)' : 'You have (from /claimslist)';
+    }
     hoursOut.textContent = hours.value;
     needs.textContent = plan.ok ? format(plan.area) : '–';
     has.textContent = format(plan.owned);

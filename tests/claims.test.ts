@@ -85,3 +85,24 @@ test('blocks tied up in other claims reduce what is free', () => {
   assert.equal(planClaim(10, 10, 0, limits, 81).ok && planClaim(10, 10, 0, limits, 81).owned, 119);
   assert.equal(planClaim(10, 10, 0, limits, 9999).owned, 0);
 });
+
+test('a /claimslist figure replaces the estimate', () => {
+  // A new player who sold 150 of their 200 blocks has 50 left.
+  const plan = planClaim(10, 10, 0, limits, 0, 50);
+  assert.ok(plan.ok);
+  assert.equal(plan.owned, 50);
+  assert.equal(plan.short, 50);
+  assert.equal(plan.hoursToEarn, 1);
+  assert.equal(plan.costToBuy, 500);
+
+  // Blocks in other claims are already counted in that figure.
+  assert.equal(planClaim(10, 10, 0, limits, 81, 50).owned, 50);
+  assert.equal(planClaim(10, 10, 0, limits, 0, -5).owned, 0);
+});
+
+test('the estimate leaves out the block the first chest uses', () => {
+  const plan = planClaim(10, 10, 0, limits, 1);
+  assert.ok(plan.ok);
+  assert.equal(plan.owned, 199);
+  assert.equal(plan.short, -99);
+});

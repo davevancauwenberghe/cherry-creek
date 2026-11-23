@@ -4,6 +4,7 @@ import Checklist from '@/components/guide/Checklist.astro';
 import ClaimPlanner from '@/components/guide/ClaimPlanner.astro';
 import CommandFinder from '@/components/guide/CommandFinder.astro';
 import {
+  autoClaimArea,
   count,
   euros,
   levelRewardGroups,
@@ -18,8 +19,7 @@ const { economy, claims, starterKit } = server;
 
 // Whole sentences are built here rather than mixing text and {expressions}
 // across line breaks in the template, where the space between them gets lost.
-const firstChestNote =
-  'Placing it protects just the chest itself. Use a golden shovel to protect the rest of your base.';
+const firstChestNote = `Placing it claims just the chest itself, which uses ${autoClaimArea === 1 ? '1 claim block' : `${count(autoClaimArea)} claim blocks`}. Use a golden shovel to protect the rest of your base.`;
 const combatNote = `are blocked for ${server.pvp.combatTimeoutSeconds} seconds after fighting another player.`;
 
 const sections = [

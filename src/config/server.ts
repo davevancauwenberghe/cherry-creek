@@ -32,8 +32,11 @@ export const server = {
     /** GriefPrevention rejects claims narrower or smaller than this. */
     minWidth: 5,
     minArea: 25,
-    // AutomaticNewPlayerClaimsRadius is 0: a new player's first chest is
-    // protected on its own, with no claim around it. The guide says so in words.
+    /**
+     * AutomaticNewPlayerClaimsRadius. A new player's first chest is claimed
+     * this many blocks out in each direction; 0 claims just the chest.
+     */
+    autoClaimRadius: 0,
   },
   pvp: {
     /** Seconds after combat during which /home and /tpa are blocked. */
@@ -42,6 +45,10 @@ export const server = {
   /** Items handed to first-time players, alongside the starting balance. */
   starterKit: ['1 wooden pickaxe', '1 wooden axe', '2 apples'],
 } as const;
+
+/** Side length and claim blocks used by the automatic first-chest claim. */
+export const autoClaimSide = server.claims.autoClaimRadius * 2 + 1;
+export const autoClaimArea = autoClaimSide ** 2;
 
 /** "5, 10 and 15" */
 export const listAnd = (items: (string | number)[]) =>
