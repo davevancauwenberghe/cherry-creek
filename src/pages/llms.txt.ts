@@ -6,7 +6,7 @@
 import type { APIRoute } from 'astro';
 import { mods } from '@/config/mods';
 import { rules, rulesPublished } from '@/config/rules';
-import { autoClaimArea, autoClaimSide, count, euros, server } from '@/config/server';
+import { count, euros, levelRewardGroups, listAnd, server } from '@/config/server';
 import { site } from '@/config/site';
 
 export const GET: APIRoute = ({ site: origin }) => {
@@ -27,8 +27,8 @@ export const GET: APIRoute = ({ site: origin }) => {
     '- Access: whitelisted. Join the Discord and ask the community administrators for access. Joining Discord does not grant access automatically.',
     '- Language: English',
     '- Currency: in-game euros are fictional. They are not real money, payments or cryptocurrency.',
-    `- Land protection: GriefPrevention. ${count(claims.startingBlocks)} starting claim blocks, ${count(claims.blocksPerHour)} more per eligible hour up to ${count(claims.maxAccruedBlocks)}, at most ${count(claims.maxClaims)} claims per player, Overworld only. A first chest creates a ${autoClaimSide} × ${autoClaimSide} claim (${autoClaimArea} blocks).`,
-    `- Economy: EssentialsX, VaultUnlocked and EconomyShopGUI. Players start with ${euros(economy.startingBalance)}; extra claim blocks cost ${euros(economy.claimBlockPrice)} each.`,
+    `- Land protection: GriefPrevention. ${count(claims.startingBlocks)} starting claim blocks, ${count(claims.blocksPerHour)} more per eligible hour up to ${count(claims.maxAccruedBlocks)}, at most ${count(claims.maxClaims)} claims per player, Overworld only. Claims must be at least ${claims.minWidth} blocks wide and ${count(claims.minArea)} blocks in area. A new player's first chest is protected automatically.`,
+    `- Economy: EssentialsX, VaultUnlocked and EconomyShopGUI. Players start with ${euros(economy.startingBalance)}. The server shop is the ${economy.marketName} (/market). Level rewards: ${levelRewardGroups.map((g) => `${euros(g.reward)} at level ${listAnd(g.levels)}`).join('; ')}. Claim blocks cost ${euros(economy.claimBlockPrice)} each to buy and pay ${euros(economy.claimBlockSellValue)} each when sold.`,
     '- Quality of life: homes, teleport requests, VeinMiner (natural logs and coal veins only), ToolStats, DoorsReloaded.',
     '- Community: Discord linked to in-game chat through DiscordSRV.',
     '- World map: interactive 3D map (BlueMap) with a land-claim overlay.',

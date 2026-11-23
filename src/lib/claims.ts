@@ -38,15 +38,23 @@ export function planClaim(
   length: number,
   hoursPlayed: number,
   limits: ClaimLimits,
-  /** Blocks already tied up in the player's other claims. */
+  /** Blocks already tied up in the player's other claims. Ignored when `available` is given. */
   usedBlocks = 0,
+  /**
+   * Blocks the player has left, as reported by /claimslist. When known it
+   * replaces the estimate, so claims, purchases and sales are all counted.
+   */
+  available?: number,
 ): ClaimPlan {
   const area = width * length;
   const accrued = Math.min(
     Math.max(hoursPlayed, 0) * limits.blocksPerHour,
     limits.maxAccruedBlocks,
   );
-  const owned = Math.max(limits.startingBlocks + accrued - Math.max(usedBlocks, 0), 0);
+  const owned =
+    available !== undefined
+      ? Math.max(Math.floor(available), 0)
+      : Math.max(limits.startingBlocks + accrued - Math.max(usedBlocks, 0), 0);
 
   if (Math.min(width, length) < limits.minWidth)
     return { ok: false, reason: 'too-narrow', area, owned };

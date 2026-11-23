@@ -76,7 +76,8 @@ if (planner) {
   const width = planner.querySelector<HTMLInputElement>('[data-planner-width]')!;
   const length = planner.querySelector<HTMLInputElement>('[data-planner-length]')!;
   const hours = planner.querySelector<HTMLInputElement>('[data-planner-hours]')!;
-  const starter = planner.querySelector<HTMLInputElement>('[data-planner-starter]');
+  const availableInput = planner.querySelector<HTMLInputElement>('[data-planner-available]');
+  const hasLabel = planner.querySelector('[data-planner-has-label]');
   const starterArea = number('starterArea');
   const hoursOut = planner.querySelector('[data-planner-hours-out]')!;
   const needs = planner.querySelector('[data-planner-needs]')!;
@@ -89,11 +90,14 @@ if (planner) {
   const side = (input: HTMLInputElement) =>
     Math.min(500, Math.max(0, Math.floor(Number(input.value)) || 0));
 
+  // Smallest square claim the limits allow, used as an example size.
+  const example = Math.max(limits.minWidth, Math.ceil(Math.sqrt(limits.minArea)));
+
   const describe = (plan: ClaimPlan): string => {
     if (!plan.ok) {
       return plan.reason === 'too-narrow'
         ? `Too narrow. A claim must be at least ${limits.minWidth} blocks wide on every side.`
-        : `Too small. A claim must cover at least ${format(limits.minArea)} blocks, for example 10 × 10.`;
+        : `Too small. A claim must cover at least ${format(limits.minArea)} blocks, for example ${example} × ${example}.`;
     }
     if (plan.short === 0) return 'It fits exactly. Every block you have goes into this claim.';
     if (plan.short < 0) return `It fits, with ${blocksText(-plan.short)} to spare.`;
@@ -110,8 +114,22 @@ if (planner) {
   };
 
   const calculate = () => {
-    const used = starter?.checked ? starterArea : 0;
-    const plan = planClaim(side(width), side(length), Number(hours.value), limits, used);
+    // A /claimslist figure, when given, replaces the estimate.
+    const raw = availableInput?.value.trim() ?? '';
+    const entered = raw === '' ? NaN : Number(raw);
+    const available = Number.isFinite(entered) ? Math.max(Math.floor(entered), 0) : undefined;
+    const plan = planClaim(
+      side(width),
+      side(length),
+      Number(hours.value),
+      limits,
+      starterArea,
+      available,
+    );
+    if (hasLabel) {
+      hasLabel.textContent =
+        available === undefined ? 'You have (estimated)' : 'You have (from /claimslist)';
+    }
     hoursOut.textContent = hours.value;
     needs.textContent = plan.ok ? format(plan.area) : '–';
     has.textContent = format(plan.owned);

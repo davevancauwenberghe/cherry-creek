@@ -1,6 +1,6 @@
 ---
 /** Economy and land protection. Figures come from src/config/server.ts. */
-import { count, euros, server } from '@/config/server';
+import { count, euros, levelRewardGroups, server } from '@/config/server';
 import Icon from './Icon.astro';
 
 const backupNote =
@@ -8,7 +8,12 @@ const backupNote =
 
 const economy = [
   { value: euros(server.economy.startingBalance), label: 'Starting balance for every new player' },
+  ...levelRewardGroups.map((group) => ({
+    value: euros(group.reward),
+    label: `Reward for reaching level ${group.levels.join(', ').replace(/, (?=[^,]*$)/, ' or ')}`,
+  })),
   { value: euros(server.economy.claimBlockPrice), label: 'Price of one extra claim block' },
+  { value: euros(server.economy.claimBlockSellValue), label: 'Paid for each claim block you sell' },
 ];
 
 const land = [
@@ -45,10 +50,10 @@ const land = [
           The Cherry Creek economy
         </h3>
         <p class="mt-3 text-silver">
-          Everyone starts with a little money. Buy and sell items in the server shop with{' '}
-          <code class="cmd">/shop</code>, and send money to other players with{' '}
-          <code class="cmd">/pay</code>. Shops are run by EconomyShopGUI, with balances handled by
-          EssentialsX and VaultUnlocked.
+          Everyone starts with a little money, and levelling up earns more. Buy and sell items at
+          the {server.economy.marketName} with <code class="cmd">/market</code>, and send money to
+          other players with <code class="cmd">/pay</code>. Shops are run by EconomyShopGUI, with
+          balances handled by EssentialsX and VaultUnlocked.
         </p>
         <dl class="facts mt-7" style="--tone: var(--color-gold)">
           {economy.map((fact) => (
