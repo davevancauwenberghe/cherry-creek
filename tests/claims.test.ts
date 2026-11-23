@@ -7,8 +7,8 @@ const limits: ClaimLimits = {
   blocksPerHour: 50,
   maxAccruedBlocks: 20_000,
   minWidth: 5,
-  minArea: 100,
-  blockPrice: 20,
+  minArea: 25,
+  blockPrice: 10,
 };
 
 test('a claim that fits reports the spare blocks', () => {
@@ -26,7 +26,7 @@ test('a shortfall within the accrual limit quotes hours and a price', () => {
   assert.equal(plan.short, 1000);
   assert.equal(plan.hoursToEarn, 20);
   assert.equal(plan.mustBuy, 0);
-  assert.equal(plan.costToBuy, 20_000);
+  assert.equal(plan.costToBuy, 10_000);
 });
 
 test('a shortfall beyond the accrual limit cannot be earned by playing', () => {
@@ -64,14 +64,19 @@ test('claims below the minimum width or area are rejected', () => {
     owned: 200,
   });
   assert.equal(planClaim(4, 100, 0, limits).ok, false);
-  const small = planClaim(5, 5, 0, limits);
+  // 5 × 5 is the smallest claim Cherry Creek allows.
+  assert.equal(planClaim(5, 5, 0, limits).ok, true);
+
+  // A larger minimum area can reject a claim that is wide enough.
+  const strict = { ...limits, minArea: 100 };
+  const small = planClaim(5, 5, 0, strict);
   assert.equal(small.ok, false);
   assert.equal(!small.ok && small.reason, 'too-small');
-  assert.equal(planClaim(5, 20, 0, limits).ok, true);
+  assert.equal(planClaim(5, 20, 0, strict).ok, true);
 });
 
 test('blocks tied up in other claims reduce what is free', () => {
-  // The automatic first-chest claim (9 × 9) leaves 119 of the 200 starting blocks.
+  // An existing 9 × 9 claim leaves 119 of the 200 starting blocks.
   const plan = planClaim(10, 12, 0, limits, 81);
   assert.ok(plan.ok);
   assert.equal(plan.owned, 119);

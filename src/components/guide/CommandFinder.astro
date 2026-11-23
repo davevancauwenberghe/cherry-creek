@@ -21,11 +21,16 @@ const commands: { command: string; does: string; category: (typeof categories)[n
     does: 'Send in-game money to another player.',
     category: 'Money',
   },
-  { command: '/shop', does: 'Open the server shop.', category: 'Money' },
-  { command: '/market', does: 'Alternative command for the shop.', category: 'Money' },
+  { command: '/market', does: 'Open the Cherry Market, the server shop.', category: 'Money' },
+  { command: '/baltop', does: 'See the top balances on Cherry Creek.', category: 'Money' },
   { command: '/sellgui', does: 'Open the selling interface.', category: 'Money' },
   { command: '/sellall', does: "Access the shop's bulk-selling command.", category: 'Money' },
   { command: '/buyclaimblocks <amount>', does: 'Purchase extra claim blocks.', category: 'Claims' },
+  {
+    command: '/sellclaimblocks <amount>',
+    does: 'Sell claim blocks you are not using.',
+    category: 'Claims',
+  },
   {
     command: '/claimslist',
     does: 'View your claims and available claim blocks.',
@@ -58,8 +63,15 @@ const commands: { command: string; does: string; category: (typeof categories)[n
     does: 'Temporarily stop hostile mobs from targeting you.',
     category: 'General',
   },
-  { command: '/about', does: 'Show more information about Cherry Creek.', category: 'General' },
+  {
+    command: '/about',
+    does: 'Read more about Cherry Creek, right in the game.',
+    category: 'General',
+  },
 ];
+
+// Shown alphabetically, whatever order they are listed in above.
+commands.sort((a, b) => a.command.localeCompare(b.command, 'en'));
 
 /** What lands on the clipboard: the command up to its first placeholder. */
 const typed = (command: string) =>

@@ -71,7 +71,7 @@ const plural: Record<ModKind, string> = {
         ))}
       </div>
       <p class="mt-3 text-sm text-silver" role="status" data-mods-count>
-        {mods.length} extras, in alphabetical order.
+        {mods.length} extras to choose from.
       </p>
 
       <ul class="mt-6 grid gap-4 md:grid-cols-2">
@@ -125,7 +125,7 @@ const plural: Record<ModKind, string> = {
           if (count) {
             count.textContent =
               kind === ''
-                ? `${shown} extras, in alphabetical order.`
+                ? `${shown} extras to choose from.`
                 : `${shown} of ${items.length} shown: ${chip.textContent?.trim().toLowerCase()}.`;
           }
         });
